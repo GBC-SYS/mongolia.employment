@@ -13,7 +13,13 @@ export default function PrayerLettersPage() {
               {prayerLetters.length > 0 ? `총 ${prayerLetters.length}개의 편지` : "몽골 선교 2026"}
             </p>
           </div>
-          <PrayerHeartButton />
+          <div className="flex flex-col items-end gap-1.5 pt-1">
+            <PrayerHeartButton />
+            <p className="text-white/40 text-xs text-right leading-relaxed">
+              기도에 동참해주신다면 하트를 눌러주세요<br />
+              저희에게 큰 힘이 됩니다
+            </p>
+          </div>
         </div>
       </div>
       <ImageViewer letters={prayerLetters} />
