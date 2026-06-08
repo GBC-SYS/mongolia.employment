@@ -27,7 +27,7 @@ export default function PrayerLetterDetailView({ letter }: { letter: PrayerLette
           src={letter.src}
           alt=""
           fill
-          className="object-contain"
+          className="object-contain object-top"
           sizes="100vw"
           priority
         />
