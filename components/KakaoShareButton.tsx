@@ -11,14 +11,15 @@ declare global {
 
 interface Props {
   src: string;
+  letterId: string;
 }
 
-export default function KakaoShareButton({ src }: Props) {
+export default function KakaoShareButton({ src, letterId }: Props) {
   const handleShare = () => {
     if (typeof window === "undefined" || !window.Kakao?.isInitialized()) return;
 
     const imageUrl = window.location.origin + src;
-    const pageUrl = window.location.href;
+    const pageUrl = `${window.location.origin}/prayer-letters/${letterId}`;
 
     window.Kakao.Share.sendDefault({
       objectType: "feed",

@@ -35,7 +35,7 @@ export default function PrayerLetterDetailView({ letter }: { letter: PrayerLette
 
       {/* 공유 버튼 */}
       <div className="flex-shrink-0 px-6 pt-4 pb-10">
-        <KakaoShareButton src={letter.src} />
+        <KakaoShareButton src={letter.src} letterId={letter.id} />
       </div>
     </div>
   );
