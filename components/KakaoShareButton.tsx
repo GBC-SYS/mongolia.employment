@@ -25,7 +25,7 @@ export default function KakaoShareButton({ src, letterId }: Props) {
       objectType: "feed",
       content: {
         title: "몽골 선교 2026 기도편지",
-        description: "함께 기도해 주세요 🙏",
+        description: "함께 기도해 주세요 감사합니다. 🙏",
         imageUrl,
         link: { mobileWebUrl: pageUrl, webUrl: pageUrl },
       },
