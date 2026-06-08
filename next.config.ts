@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  outputFileTracingIncludes: {
+    "/api/thumbnail/[id]": ["./public/images/prayer-letters/**"],
+  },
 };
 
 export default nextConfig;
