@@ -1,0 +1,45 @@
+"use client";
+
+import { useAtom } from "jotai";
+import { NavArrowDown } from "iconoir-react";
+import { guideOpenSectionsAtom } from "@/store/atoms";
+import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+
+interface Props {
+  sectionKey: string;
+  title: string;
+  emoji: string;
+  children: React.ReactNode;
+}
+
+export default function GuideAccordion({ sectionKey, title, emoji, children }: Props) {
+  const [openSections, setOpenSections] = useAtom(guideOpenSectionsAtom);
+  const open = !!openSections[sectionKey];
+
+  const toggle = () =>
+    setOpenSections((prev) => ({ ...prev, [sectionKey]: !prev[sectionKey] }));
+
+  return (
+    <Card className="overflow-hidden bg-white/5 border-white/10">
+      <button
+        onClick={toggle}
+        className="w-full flex items-center justify-between px-5 py-4 text-left"
+      >
+        <div className="flex items-center gap-3">
+          <span className="text-2xl">{emoji}</span>
+          <span className="font-semibold text-white">{title}</span>
+        </div>
+        <NavArrowDown
+          width={18}
+          height={18}
+          className={cn(
+            "text-slate-400 transition-transform duration-200",
+            open && "rotate-180"
+          )}
+        />
+      </button>
+      {open && <div className="px-5 pb-5">{children}</div>}
+    </Card>
+  );
+}
