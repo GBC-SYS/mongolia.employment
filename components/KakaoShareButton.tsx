@@ -19,7 +19,7 @@ export default function KakaoShareButton({ src, letterId }: Props) {
     if (typeof window === "undefined" || !window.Kakao?.isInitialized()) return;
 
     const imageUrl = window.location.origin + src;
-    const pageUrl = `${window.location.origin}/prayer-letters/${letterId}`;
+    const pageUrl = `https://mongolia-employment.vercel.app/prayer-letters/${letterId}`;
 
     window.Kakao.Share.sendDefault({
       objectType: "feed",
