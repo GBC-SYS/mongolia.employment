@@ -134,6 +134,29 @@ checklistAtom           // 체크리스트 체크 상태 Record<string, boolean>
 
 ---
 
+## 배포 (Vercel)
+
+- **플랫폼**: Vercel Hobby (무료) — GitHub `GBC-SYS/mongolia.employment` public 레포 연결
+- **CI/CD**: `main` 브랜치 push 시 자동 배포
+- **Node.js**: `package.json`의 `engines` 필드에 `>=20.0.0` 명시 (Vercel 빌드 환경 고정)
+
+### 환경변수
+
+| 키 | 설명 | 위치 |
+|----|------|------|
+| `NEXT_PUBLIC_KAKAO_APP_KEY` | 카카오 JavaScript SDK 키 | Vercel 대시보드 + `.env.local` |
+
+- 로컬: 프로젝트 루트에 `.env.local` 파일 생성 후 위 키 추가
+- Vercel: 대시보드 → 프로젝트 → Settings → Environment Variables에 등록
+
+### 카카오 공유 도메인 등록
+
+`components/KakaoShareButton.tsx` — 카카오 공유 버튼 구현체  
+공유 기능이 동작하려면 [카카오 Developers](https://developers.kakao.com) → 앱 → **플랫폼** → Web 사이트 도메인에 배포 URL 등록 필수.  
+(도메인 미등록 시 "잘못된 요청으로 인증에 실패" 오류 발생)
+
+---
+
 ## 주요 결정 사항 (히스토리)
 
 | 결정 | 이유 |
@@ -142,3 +165,5 @@ checklistAtom           // 체크리스트 체크 상태 Record<string, boolean>
 | shadcn CLI 대신 수동 작성 | Tailwind v4는 shadcn CLI가 생성하는 config 방식과 충돌 |
 | `/guide`, `/prayer-letters` Dynamic 렌더링 | Jotai 클라이언트 컴포넌트의 SSR 충돌 방지 |
 | `ClientOnly` 래퍼 도입 | Jotai useAtom 호출 시 서버 사이드 실행 방지 |
+| GitHub 레포 public 전환 | Vercel Hobby 플랜은 GitHub Organization private 레포 배포 불가 |
+| `package.json` engines 필드 추가 | Vercel 빌드 환경 Node.js 버전 불일치로 인한 설치 실패 방지 |
