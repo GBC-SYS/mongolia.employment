@@ -10,22 +10,21 @@ const glass = {
   background: "rgba(255, 255, 255, 0.55)",
   backdropFilter: "blur(20px) saturate(180%)",
   WebkitBackdropFilter: "blur(20px) saturate(180%)",
-  borderBottom: "1px solid rgba(255, 255, 255, 0.95)",
 } as React.CSSProperties;
 
 const brandDark = "#14532d";
 
 export default function GuidePage() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen" style={glass}>
       {/* 헤더 */}
-      <div className="px-5 pt-14 pb-6" style={glass}>
+      <div className="px-5 pt-14 pb-6" style={{ borderBottom: "1px solid rgba(255, 255, 255, 0.95)" }}>
         <h1 className="text-2xl font-bold text-gray-900">가이드북</h1>
         <p className="text-sm mt-1 font-medium" style={{ color: brandDark }}>선교를 준비하며</p>
       </div>
 
       <ClientOnly>
-      <div className="flex flex-col gap-3 px-4 py-4" style={glass}>
+      <div className="flex flex-col gap-3 px-4 py-4">
         {/* 날씨 */}
         <GuideAccordion sectionKey="weather" title={weatherData.title} emoji={weatherData.emoji}>
           <p className="text-sm text-gray-500 mb-3 leading-relaxed">
