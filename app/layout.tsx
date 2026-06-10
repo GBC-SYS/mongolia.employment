@@ -3,6 +3,9 @@ import "./globals.css";
 import Image from "next/image";
 import BottomNav from "@/components/BottomNav";
 import RecoilProvider from "@/components/RecoilProvider";
+import { Playfair_Display } from "next/font/google";
+
+const playfair = Playfair_Display({ subsets: ["latin"], weight: ["700"] });
 
 export const metadata: Metadata = {
   title: "몽골 선교 2026",
@@ -68,7 +71,7 @@ export default function RootLayout({
                   2026 Mongolia Mission Trip
                 </p>
                 <h1
-                  className="text-5xl font-black leading-tight mb-6 tracking-tight uppercase"
+                  className={`${playfair.className} text-5xl leading-tight mb-6 tracking-tight uppercase`}
                   style={{
                     color: "#FCDD4F",
                     textShadow: "1px 1px 0 black",
