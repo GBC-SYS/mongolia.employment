@@ -18,7 +18,11 @@ const glass = {
   background: "rgba(255, 255, 255, 0.55)",
   backdropFilter: "blur(20px) saturate(180%)",
   WebkitBackdropFilter: "blur(20px) saturate(180%)",
-  borderBottom: "1px solid rgba(255, 255, 255, 0.95)",
+} as React.CSSProperties;
+
+const cardGlass = {
+  ...glass,
+  boxShadow: "0 4px 16px rgba(0, 0, 0, 0.08)",
 } as React.CSSProperties;
 
 const brand = "#166534";
@@ -26,9 +30,9 @@ const brandDark = "#14532d";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col" style={glass}>
       {/* 헤더 */}
-      <div className="px-5 pt-14 pb-8" style={glass}>
+      <div className="px-5 pt-14 pb-8" style={{ borderBottom: "1px solid rgba(255, 255, 255, 0.95)" }}>
         <p className="text-sm mb-1 font-medium" style={{ color: brandDark }}>🇲🇳 몽골 단기선교팀</p>
         <h1 className="text-3xl font-bold mb-2 text-gray-900">몽골 선교 2026</h1>
         <Badge
@@ -39,12 +43,12 @@ export default function HomePage() {
         </Badge>
       </div>
 
-      <div className="flex flex-col gap-3 px-4 py-4" style={glass}>
+      <div className="flex flex-col gap-3 px-4 py-4">
         {/* 카운트다운 */}
         <Countdown />
 
         {/* 소개 문구 */}
-        <Card className="border-0 rounded-2xl" style={glass}>
+        <Card className="border-0 rounded-2xl">
           <CardContent className="pt-4">
             <p className="text-gray-700 text-sm leading-relaxed">
               몽골의 초원 위에서 복음을 전하고, 함께 기도하며 나아가는 선교팀입니다.
@@ -58,7 +62,7 @@ export default function HomePage() {
           <Link
             href="/prayer-letters"
             className="rounded-2xl p-5 flex flex-col gap-3 active:scale-95 transition-transform"
-            style={glass}
+            style={cardGlass}
           >
             <Mail width={28} height={28} strokeWidth={1.5} style={{ color: brand }} />
             <div>
@@ -69,12 +73,12 @@ export default function HomePage() {
           <Link
             href="/guide"
             className="rounded-2xl p-5 flex flex-col gap-3 active:scale-95 transition-transform"
-            style={glass}
+            style={cardGlass}
           >
             <Book width={28} height={28} strokeWidth={1.5} style={{ color: brand }} />
             <div>
               <p className="font-semibold text-gray-900">가이드북</p>
-              <p className="text-gray-500 text-xs mt-0.5">준비물 & 안전수칙</p>
+              <p className="text-gray-500 text-xs mt-0.5">준비물 &amp; 안전수칙</p>
             </div>
           </Link>
         </div>
@@ -83,7 +87,7 @@ export default function HomePage() {
         <Link
           href="/song"
           className="rounded-2xl p-5 flex items-center gap-4 active:scale-95 transition-transform"
-          style={glass}
+          style={cardGlass}
         >
           <MusicNote width={28} height={28} strokeWidth={1.5} style={{ color: brand }} />
           <div className="flex-1">
@@ -94,7 +98,7 @@ export default function HomePage() {
         </Link>
 
         {/* 성경 말씀 */}
-        <Card className="border-0 rounded-2xl overflow-hidden" style={glass}>
+        <Card className="border-0 rounded-2xl overflow-hidden">
           <CardContent className="pt-4 pb-4">
             <p className="text-gray-800 text-sm leading-relaxed font-medium italic">
               "다시 밤이 없겠고 햇빛도 쓸 데 없으리 이는 주 하나님이 그들에게 비치심이라 그들이 세세토록 왕 노릇 하리로다"
@@ -104,7 +108,7 @@ export default function HomePage() {
         </Card>
 
         {/* 선교 일정 */}
-        <Card className="border-0 rounded-2xl" style={glass}>
+        <Card className="border-0 rounded-2xl">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-gray-900">
               <Calendar width={18} height={18} style={{ color: brand }} />
