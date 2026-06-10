@@ -9,7 +9,7 @@ const glass = {
   background: "rgba(255, 255, 255, 0.55)",
   backdropFilter: "blur(20px) saturate(180%)",
   WebkitBackdropFilter: "blur(20px) saturate(180%)",
-  border: "1px solid rgba(255, 255, 255, 0.95)",
+  borderBottom: "1px solid rgba(255, 255, 255, 0.95)",
 } as React.CSSProperties;
 
 export default async function PrayerLettersPage() {
@@ -20,13 +20,13 @@ export default async function PrayerLettersPage() {
         <div className="flex items-start justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">기도편지</h1>
-            <p className="text-sm mt-1 font-medium" style={{ color: "#14532d" }}>
+            <p className="text-sm mt-1 font-medium text-gray-900">
               {prayerLetters.length > 0 ? `총 ${prayerLetters.length}개의 편지` : "몽골 선교 2026"}
             </p>
           </div>
           <div className="flex flex-col items-end gap-1.5 pt-1">
             <PrayerHeartButton initialCount={initialCount} />
-            <p className="text-gray-400 text-xs text-right leading-relaxed">
+            <p className="text-gray-900 text-xs text-right leading-relaxed">
               기도에 동참해주신다면 하트를 눌러주세요<br />
               저희에게 큰 힘이 됩니다
             </p>

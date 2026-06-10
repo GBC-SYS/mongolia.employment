@@ -18,7 +18,7 @@ const glass = {
   background: "rgba(255, 255, 255, 0.55)",
   backdropFilter: "blur(20px) saturate(180%)",
   WebkitBackdropFilter: "blur(20px) saturate(180%)",
-  border: "1px solid rgba(255, 255, 255, 0.95)",
+  borderBottom: "1px solid rgba(255, 255, 255, 0.95)",
 } as React.CSSProperties;
 
 const brand = "#166534";
@@ -39,7 +39,7 @@ export default function HomePage() {
         </Badge>
       </div>
 
-      <div className="flex flex-col gap-3 px-4 py-4">
+      <div className="flex flex-col gap-3 px-4 py-4" style={glass}>
         {/* 카운트다운 */}
         <Countdown />
 
@@ -94,7 +94,7 @@ export default function HomePage() {
         </Link>
 
         {/* 성경 말씀 */}
-        <Card className="border-0 rounded-2xl overflow-hidden" style={{ ...glass, borderLeft: `3px solid ${brand}` }}>
+        <Card className="border-0 rounded-2xl overflow-hidden" style={glass}>
           <CardContent className="pt-4 pb-4">
             <p className="text-gray-800 text-sm leading-relaxed font-medium italic">
               "다시 밤이 없겠고 햇빛도 쓸 데 없으리 이는 주 하나님이 그들에게 비치심이라 그들이 세세토록 왕 노릇 하리로다"

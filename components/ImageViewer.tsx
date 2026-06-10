@@ -21,12 +21,12 @@ export default function ImageViewer({ letters }: Props) {
   }
 
   return (
-    <div className="grid grid-cols-2 gap-3 p-4">
+    <div className="grid grid-cols-2 gap-3 p-4" style={{ background: "rgba(255, 255, 255, 0.55)", backdropFilter: "blur(20px) saturate(180%)", WebkitBackdropFilter: "blur(20px) saturate(180%)" }}>
       {letters.map((letter) => (
         <Link
           key={letter.id}
           href={`/prayer-letters/${letter.id}`}
-          className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-white/60 shadow-sm active:scale-95 transition-transform block"
+          className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-white/60 shadow-sm active:scale-95 transition-transform block border border-white"
         >
           <Image
             src={letter.src}

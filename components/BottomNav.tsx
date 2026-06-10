@@ -32,7 +32,7 @@ export default function BottomNav() {
               key={href}
               href={href}
               className={`flex-1 flex flex-col items-center justify-center py-3 gap-1 transition-colors ${
-                isActive ? "text-[#166534]" : "text-gray-400"
+                isActive ? "text-[#166534]" : "text-gray-900"
               }`}
             >
               <Icon width={22} height={22} strokeWidth={isActive ? 2 : 1.5} />
