@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Mail, Book, Calendar } from "iconoir-react";
+import { Mail, Book, Calendar, MusicNote } from "iconoir-react";
 import Countdown from "@/components/Countdown";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -78,6 +78,30 @@ export default function HomePage() {
             </div>
           </Link>
         </div>
+
+        {/* 합창곡 진입 카드 */}
+        <Link
+          href="/song"
+          className="rounded-2xl p-5 flex items-center gap-4 active:scale-95 transition-transform"
+          style={glass}
+        >
+          <MusicNote width={28} height={28} strokeWidth={1.5} style={{ color: brand }} />
+          <div className="flex-1">
+            <p className="font-semibold text-gray-900">합창곡</p>
+            <p className="text-gray-500 text-xs mt-0.5">한·몽 가사 보기</p>
+          </div>
+          <span className="text-xs font-medium px-2.5 py-1 rounded-full" style={{ background: "rgba(22,101,52,0.10)", color: brandDark }}>송폼</span>
+        </Link>
+
+        {/* 성경 말씀 */}
+        <Card className="border-0 rounded-2xl overflow-hidden" style={{ ...glass, borderLeft: `3px solid ${brand}` }}>
+          <CardContent className="pt-4 pb-4">
+            <p className="text-gray-800 text-sm leading-relaxed font-medium italic">
+              "다시 밤이 없겠고 햇빛도 쓸 데 없으리 이는 주 하나님이 그들에게 비치심이라 그들이 세세토록 왕 노릇 하리로다"
+            </p>
+            <p className="text-xs mt-2 font-semibold" style={{ color: brandDark }}>요한계시록 22:5</p>
+          </CardContent>
+        </Card>
 
         {/* 선교 일정 */}
         <Card className="border-0 rounded-2xl" style={glass}>

@@ -1,19 +1,12 @@
-import { Redis } from "@upstash/redis";
 import { NextResponse } from "next/server";
-
-const redis = new Redis({
-  url: process.env.KV_REST_API_URL!,
-  token: process.env.KV_REST_API_TOKEN!,
-});
-
-const KEY = "prayer_count";
+import { redis, PRAYER_COUNT_KEY, getPrayerCount } from "@/lib/redis";
 
 export async function GET() {
-  const count = (await redis.get<number>(KEY)) ?? 0;
+  const count = await getPrayerCount();
   return NextResponse.json({ count });
 }
 
 export async function POST() {
-  const count = await redis.incr(KEY);
+  const count = await redis.incr(PRAYER_COUNT_KEY);
   return NextResponse.json({ count });
 }

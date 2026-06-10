@@ -5,16 +5,13 @@ import { Heart } from "iconoir-react";
 
 const STORAGE_KEY = "prayer_heart_clicked";
 
-export default function PrayerHeartButton() {
-  const [count, setCount] = useState<number | null>(null);
+export default function PrayerHeartButton({ initialCount = 0 }: { initialCount?: number }) {
+  const [count, setCount] = useState<number>(initialCount);
   const [clicked, setClicked] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setClicked(localStorage.getItem(STORAGE_KEY) === "true");
-    fetch("/api/prayer-count")
-      .then((r) => r.json())
-      .then((d) => setCount(d.count));
   }, []);
 
   const handleClick = async () => {
@@ -50,7 +47,7 @@ export default function PrayerHeartButton() {
         className={clicked ? "fill-rose-500 text-rose-500" : "text-gray-400"}
       />
       <span className={`text-sm font-semibold tabular-nums ${clicked ? "text-rose-500" : "text-gray-400"}`}>
-        {count !== null ? count.toLocaleString() : "·"}
+        {count.toLocaleString()}
       </span>
     </button>
   );

@@ -1,6 +1,9 @@
 import { prayerLetters } from "@/data/prayer-letters";
 import ImageViewer from "@/components/ImageViewer";
 import PrayerHeartButton from "@/components/PrayerHeartButton";
+import { getPrayerCount } from "@/lib/redis";
+
+export const dynamic = "force-dynamic";
 
 const glass = {
   background: "rgba(255, 255, 255, 0.55)",
@@ -9,7 +12,8 @@ const glass = {
   border: "1px solid rgba(255, 255, 255, 0.95)",
 } as React.CSSProperties;
 
-export default function PrayerLettersPage() {
+export default async function PrayerLettersPage() {
+  const initialCount = await getPrayerCount();
   return (
     <div className="min-h-screen">
       <div className="px-5 pt-14 pb-6" style={glass}>
@@ -21,7 +25,7 @@ export default function PrayerLettersPage() {
             </p>
           </div>
           <div className="flex flex-col items-end gap-1.5 pt-1">
-            <PrayerHeartButton />
+            <PrayerHeartButton initialCount={initialCount} />
             <p className="text-gray-400 text-xs text-right leading-relaxed">
               기도에 동참해주신다면 하트를 눌러주세요<br />
               저희에게 큰 힘이 됩니다
