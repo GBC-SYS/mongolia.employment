@@ -32,7 +32,7 @@ export default function ImageViewer({ letters }: Props) {
             src={letter.src}
             alt=""
             fill
-            className="object-contain"
+            className="object-cover object-top"
             sizes="50vw"
           />
         </Link>
