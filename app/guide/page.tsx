@@ -6,29 +6,38 @@ import { Phone, WarningTriangle } from "iconoir-react";
 
 export const dynamic = "force-dynamic";
 
+const glass = {
+  background: "rgba(255, 255, 255, 0.55)",
+  backdropFilter: "blur(20px) saturate(180%)",
+  WebkitBackdropFilter: "blur(20px) saturate(180%)",
+  border: "1px solid rgba(255, 255, 255, 0.95)",
+} as React.CSSProperties;
+
+const brandDark = "#14532d";
+
 export default function GuidePage() {
   return (
-    <div className="min-h-screen bg-[#0b1120]">
+    <div className="min-h-screen">
       {/* 헤더 */}
-      <div className="px-5 pt-14 pb-6" style={{ background: "linear-gradient(160deg,#0d1a30 0%,#111e35 100%)" }}>
-        <h1 className="text-2xl font-bold text-white">가이드북</h1>
-        <p className="text-blue-300/70 text-sm mt-1">선교를 준비하며</p>
+      <div className="px-5 pt-14 pb-6" style={glass}>
+        <h1 className="text-2xl font-bold text-gray-900">가이드북</h1>
+        <p className="text-sm mt-1 font-medium" style={{ color: brandDark }}>선교를 준비하며</p>
       </div>
 
       <ClientOnly>
       <div className="flex flex-col gap-3 px-4 py-4">
         {/* 날씨 */}
         <GuideAccordion sectionKey="weather" title={weatherData.title} emoji={weatherData.emoji}>
-          <p className="text-sm text-slate-400 mb-3 leading-relaxed">
+          <p className="text-sm text-gray-500 mb-3 leading-relaxed">
             {weatherData.subtitle}
           </p>
           <div className="flex flex-col gap-2">
             {weatherData.rows.map((row) => (
-              <div key={row.label} className="flex gap-3 bg-white/5 rounded-xl p-3">
+              <div key={row.label} className="flex gap-3 bg-white/60 rounded-xl p-3">
                 <span className="text-xl flex-shrink-0">{row.icon}</span>
                 <div>
-                  <p className="text-xs font-semibold text-slate-300">{row.label}</p>
-                  <p className="text-sm text-slate-400 mt-0.5">{row.desc}</p>
+                  <p className="text-xs font-semibold text-gray-700">{row.label}</p>
+                  <p className="text-sm text-gray-500 mt-0.5">{row.desc}</p>
                 </div>
               </div>
             ))}
@@ -45,15 +54,15 @@ export default function GuidePage() {
           <div className="flex flex-col gap-4">
             {safetyData.categories.map((cat) => (
               <div key={cat.name}>
-                <h4 className="text-sm font-semibold text-slate-300 mb-2 flex items-center gap-1.5">
+                <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1.5">
                   <span>{cat.emoji}</span>
                   {cat.name}
                 </h4>
                 <ul className="flex flex-col gap-2">
                   {cat.items.map((item) => (
                     <li key={item} className="flex gap-2 items-start">
-                      <span className="text-blue-400 mt-1 flex-shrink-0 text-xs">●</span>
-                      <span className="text-sm text-slate-400 leading-relaxed">{item}</span>
+                      <span className="mt-1 flex-shrink-0 text-xs" style={{ color: "#166534" }}>●</span>
+                      <span className="text-sm text-gray-500 leading-relaxed">{item}</span>
                     </li>
                   ))}
                 </ul>
@@ -66,7 +75,7 @@ export default function GuidePage() {
         <GuideAccordion sectionKey="emergency" title={emergencyData.title} emoji={emergencyData.emoji}>
           {/* 대사관 */}
           <div className="mb-4">
-            <h4 className="text-sm font-semibold text-slate-300 mb-2 flex items-center gap-1.5">
+            <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1.5">
               <span>{emergencyData.embassy.emoji}</span>
               {emergencyData.embassy.name}
             </h4>
@@ -76,27 +85,28 @@ export default function GuidePage() {
                   key={c.number}
                   href={`tel:${c.number}`}
                   className={`flex items-center justify-between rounded-xl px-4 py-3 ${
-                    c.highlight ? "bg-red-900/30 border border-red-500/30" : "bg-white/5"
+                    c.highlight ? "bg-red-50 border border-red-200" : "bg-white/60"
                   }`}
                 >
-                  <span className={`text-sm ${c.highlight ? "text-red-300 font-medium" : "text-slate-300"}`}>
+                  <span className={`text-sm ${c.highlight ? "text-red-600 font-medium" : "text-gray-700"}`}>
                     {c.label}
                   </span>
                   <Phone
                     width={16}
                     height={16}
-                    className={c.highlight ? "text-red-400" : "text-blue-400"}
+                    className={c.highlight ? "text-red-500" : "text-gray-400"}
+                    style={c.highlight ? undefined : { color: brandDark }}
                   />
                 </a>
               ))}
             </div>
-            <p className="text-xs text-slate-500 mt-2">⏰ {emergencyData.embassy.hours}</p>
+            <p className="text-xs text-gray-400 mt-2">⏰ {emergencyData.embassy.hours}</p>
           </div>
 
           {/* 현지 긴급 */}
           <div className="mb-4">
-            <h4 className="text-sm font-semibold text-slate-300 mb-2 flex items-center gap-1.5">
-              <WarningTriangle width={15} height={15} className="text-amber-400" />
+            <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1.5">
+              <WarningTriangle width={15} height={15} className="text-amber-500" />
               몽골 현지 긴급신고
             </h4>
             <div className="grid grid-cols-3 gap-2">
@@ -104,11 +114,11 @@ export default function GuidePage() {
                 <a
                   key={c.number}
                   href={`tel:${c.number}`}
-                  className="flex flex-col items-center bg-white/5 rounded-xl py-3 gap-1"
+                  className="flex flex-col items-center bg-white/60 rounded-xl py-3 gap-1"
                 >
                   <span className="text-xl">{c.emoji}</span>
-                  <span className="text-xs text-slate-400">{c.label}</span>
-                  <span className="text-lg font-bold text-blue-300">{c.number}</span>
+                  <span className="text-xs text-gray-500">{c.label}</span>
+                  <span className="text-lg font-bold" style={{ color: brandDark }}>{c.number}</span>
                 </a>
               ))}
             </div>
@@ -116,14 +126,17 @@ export default function GuidePage() {
 
           {/* 비상 프로토콜 */}
           <div>
-            <h4 className="text-sm font-semibold text-slate-300 mb-2">📋 비상대응 절차</h4>
+            <h4 className="text-sm font-semibold text-gray-700 mb-2">📋 비상대응 절차</h4>
             <div className="flex flex-col gap-2">
               {emergencyData.protocol.map((step, i) => (
                 <div key={i} className="flex gap-3 items-start">
-                  <span className="flex-shrink-0 w-5 h-5 bg-blue-500/30 text-blue-300 text-xs font-bold rounded-full flex items-center justify-center border border-blue-400/30">
+                  <span
+                    className="flex-shrink-0 w-5 h-5 text-xs font-bold rounded-full flex items-center justify-center border"
+                    style={{ background: "rgba(22,101,52,0.1)", color: brandDark, borderColor: "rgba(22,101,52,0.3)" }}
+                  >
                     {i + 1}
                   </span>
-                  <p className="text-sm text-slate-400 leading-relaxed">{step}</p>
+                  <p className="text-sm text-gray-500 leading-relaxed">{step}</p>
                 </div>
               ))}
             </div>

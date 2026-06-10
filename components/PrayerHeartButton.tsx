@@ -47,9 +47,9 @@ export default function PrayerHeartButton() {
         width={22}
         height={22}
         strokeWidth={1.8}
-        className={clicked ? "fill-rose-500 text-rose-500" : "text-white/40"}
+        className={clicked ? "fill-rose-500 text-rose-500" : "text-gray-400"}
       />
-      <span className={`text-sm font-semibold tabular-nums ${clicked ? "text-rose-400" : "text-white/40"}`}>
+      <span className={`text-sm font-semibold tabular-nums ${clicked ? "text-rose-500" : "text-gray-400"}`}>
         {count !== null ? count.toLocaleString() : "·"}
       </span>
     </button>

@@ -2,20 +2,27 @@ import { prayerLetters } from "@/data/prayer-letters";
 import ImageViewer from "@/components/ImageViewer";
 import PrayerHeartButton from "@/components/PrayerHeartButton";
 
+const glass = {
+  background: "rgba(255, 255, 255, 0.55)",
+  backdropFilter: "blur(20px) saturate(180%)",
+  WebkitBackdropFilter: "blur(20px) saturate(180%)",
+  border: "1px solid rgba(255, 255, 255, 0.95)",
+} as React.CSSProperties;
+
 export default function PrayerLettersPage() {
   return (
-    <div className="min-h-screen bg-[#0b1120]">
-      <div className="px-5 pt-14 pb-6" style={{ background: "linear-gradient(160deg,#0d1a30 0%,#111e35 100%)" }}>
+    <div className="min-h-screen">
+      <div className="px-5 pt-14 pb-6" style={glass}>
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-white">기도편지</h1>
-            <p className="text-blue-300/70 text-sm mt-1">
+            <h1 className="text-2xl font-bold text-gray-900">기도편지</h1>
+            <p className="text-sm mt-1 font-medium" style={{ color: "#14532d" }}>
               {prayerLetters.length > 0 ? `총 ${prayerLetters.length}개의 편지` : "몽골 선교 2026"}
             </p>
           </div>
           <div className="flex flex-col items-end gap-1.5 pt-1">
             <PrayerHeartButton />
-            <p className="text-white/40 text-xs text-right leading-relaxed">
+            <p className="text-gray-400 text-xs text-right leading-relaxed">
               기도에 동참해주신다면 하트를 눌러주세요<br />
               저희에게 큰 힘이 됩니다
             </p>

@@ -10,12 +10,19 @@ export default function PrayerLetterDetailView({ letter }: { letter: PrayerLette
   const router = useRouter();
 
   return (
-    <div className="fixed inset-0 z-[200] bg-black flex flex-col">
+    <div
+      className="fixed inset-0 z-[200] flex flex-col"
+      style={{
+        background: "rgba(255, 255, 255, 0.72)",
+        backdropFilter: "blur(24px) saturate(180%)",
+        WebkitBackdropFilter: "blur(24px) saturate(180%)",
+      }}
+    >
       {/* 닫기 버튼 */}
       <div className="flex justify-end px-4 pt-12 pb-2 flex-shrink-0">
         <button
           onClick={() => router.back()}
-          className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 text-white active:bg-white/20 transition-colors"
+          className="w-10 h-10 flex items-center justify-center rounded-full bg-black/10 text-gray-700 active:bg-black/20 transition-colors"
         >
           <Xmark width={22} height={22} />
         </button>

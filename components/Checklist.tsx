@@ -36,12 +36,12 @@ export default function Checklist() {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <p className="text-sm text-slate-400">
+        <p className="text-sm text-gray-500">
           {checkedCount} / {totalItems} 완료
         </p>
-        <div className="w-32 h-2 bg-white/10 rounded-full overflow-hidden">
+        <div className="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
           <div
-            className="h-full bg-blue-400 rounded-full transition-all duration-300"
+            className="h-full bg-[#166534] rounded-full transition-all duration-300"
             style={{ width: `${(checkedCount / totalItems) * 100}%` }}
           />
         </div>
@@ -50,7 +50,7 @@ export default function Checklist() {
       <div className="flex flex-col gap-4">
         {checklistData.categories.map((cat) => (
           <div key={cat.name}>
-            <h4 className="text-sm font-semibold text-slate-300 mb-2 flex items-center gap-1.5">
+            <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1.5">
               <span>{cat.emoji}</span>
               {cat.name}
             </h4>
@@ -68,8 +68,8 @@ export default function Checklist() {
                       className={cn(
                         "mt-0.5 flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors",
                         isChecked
-                          ? "bg-blue-500 border-blue-500"
-                          : "border-white/20"
+                          ? "bg-[#166534] border-[#166534]"
+                          : "border-gray-300"
                       )}
                     >
                       {isChecked && (
@@ -79,7 +79,7 @@ export default function Checklist() {
                     <span
                       className={cn(
                         "text-sm leading-relaxed transition-colors",
-                        isChecked ? "text-slate-600 line-through" : "text-slate-300"
+                        isChecked ? "text-gray-400 line-through" : "text-gray-700"
                       )}
                     >
                       {item}
