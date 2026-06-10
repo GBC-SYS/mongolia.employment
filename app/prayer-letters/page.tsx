@@ -9,14 +9,13 @@ const glass = {
   background: "rgba(255, 255, 255, 0.55)",
   backdropFilter: "blur(20px) saturate(180%)",
   WebkitBackdropFilter: "blur(20px) saturate(180%)",
-  borderBottom: "1px solid rgba(255, 255, 255, 0.95)",
 } as React.CSSProperties;
 
 export default async function PrayerLettersPage() {
   const initialCount = await getPrayerCount();
   return (
-    <div className="min-h-screen">
-      <div className="px-5 pt-14 pb-6" style={glass}>
+    <div className="min-h-screen pb-20 lg:pb-0" style={glass}>
+      <div className="px-5 pt-14 pb-6" style={{ borderBottom: "1px solid rgba(255, 255, 255, 0.95)" }}>
         <div className="flex items-start justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">기도편지</h1>

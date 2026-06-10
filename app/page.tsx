@@ -30,7 +30,7 @@ const brandDark = "#14532d";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen flex flex-col" style={glass}>
+    <div className="min-h-screen flex flex-col pb-20 lg:pb-0" style={glass}>
       {/* 헤더 */}
       <div className="px-5 pt-14 pb-8" style={{ borderBottom: "1px solid rgba(255, 255, 255, 0.95)" }}>
         <p className="text-sm mb-1 font-medium" style={{ color: brandDark }}>🇲🇳 몽골 단기선교팀</p>

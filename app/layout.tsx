@@ -105,7 +105,7 @@ export default function RootLayout({
           */}
           <div className="w-full lg:absolute lg:right-[190px] lg:top-0 lg:w-[390px] lg:h-screen lg:flex lg:flex-col lg:z-10" style={{ backdropFilter: "blur(2px)" }}>
             <div className="flex-1 lg:overflow-y-auto lg:[scrollbar-width:none] lg:[&::-webkit-scrollbar]:hidden">
-              <main className="pb-20 lg:pb-0">{children}</main>
+              <main className="lg:pb-0">{children}</main>
             </div>
             <BottomNav />
           </div>

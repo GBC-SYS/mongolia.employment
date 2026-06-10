@@ -4,21 +4,20 @@ const glass = {
   background: "rgba(255, 255, 255, 0.55)",
   backdropFilter: "blur(20px) saturate(180%)",
   WebkitBackdropFilter: "blur(20px) saturate(180%)",
-  borderBottom: "1px solid rgba(255, 255, 255, 0.95)",
 } as React.CSSProperties;
 
 const brandDark = "#14532d";
 
 export default function SongPage() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pb-20 lg:pb-0" style={glass}>
       {/* 헤더 */}
-      <div className="px-5 pt-14 pb-6" style={glass}>
+      <div className="px-5 pt-14 pb-6" style={{ borderBottom: "1px solid rgba(255, 255, 255, 0.95)" }}>
         <h1 className="text-2xl font-bold text-gray-900">합창곡</h1>
         <p className="text-sm mt-1 font-medium" style={{ color: brandDark }}>송폼</p>
       </div>
 
-      <div className="px-4 py-4 flex flex-col gap-6" style={{ background: "rgba(255, 255, 255, 0.55)", backdropFilter: "blur(20px) saturate(180%)", WebkitBackdropFilter: "blur(20px) saturate(180%)" }}>
+      <div className="px-4 py-4 flex flex-col gap-6">
         {/* 가사 */}
         <div
           className="rounded-2xl px-4 py-5 flex flex-col gap-1"

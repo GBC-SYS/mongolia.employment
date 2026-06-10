@@ -16,7 +16,7 @@ const brandDark = "#14532d";
 
 export default function GuidePage() {
   return (
-    <div className="min-h-screen" style={glass}>
+    <div className="min-h-screen pb-20 lg:pb-0" style={glass}>
       {/* 헤더 */}
       <div className="px-5 pt-14 pb-6" style={{ borderBottom: "1px solid rgba(255, 255, 255, 0.95)" }}>
         <h1 className="text-2xl font-bold text-gray-900">가이드북</h1>
