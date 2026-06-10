@@ -6,12 +6,12 @@ import RecoilProvider from "@/components/RecoilProvider";
 
 export const metadata: Metadata = {
   title: "몽골 선교 2026",
-  description: "몽골 선교 2026 기도편지 함께 기도해 주세요",
+  description: "몽골 선교 2026 기도편지 함께 기도해 주세요 🙏",
   metadataBase: new URL("https://mongolia.gbc.or.kr"),
   openGraph: {
     title: "몽골 선교 2026",
     description: "몽골 선교 2026 기도편지 함께 기도해 주세요",
-    images: [{ url: "/images/thumbnail.png", width: 1200, height: 630 }],
+    images: [{ url: "/images/thumbnail.webp", width: 1200, height: 630 }],
     type: "website",
   },
 };

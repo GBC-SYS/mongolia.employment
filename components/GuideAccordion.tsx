@@ -42,7 +42,7 @@ export default function GuideAccordion({ sectionKey, title, emoji, children }: P
           width={18}
           height={18}
           className={cn(
-            "text-gray-400 transition-transform duration-200",
+            "text-gray-900 transition-transform duration-200",
             open && "rotate-180"
           )}
         />
