@@ -3,6 +3,16 @@ import Link from "next/link";
 import { Mail } from "iconoir-react";
 import { type PrayerLetter } from "@/data/prayer-letters";
 
+const glass = {
+  background: "rgba(255, 255, 255, 0.55)",
+  backdropFilter: "blur(20px) saturate(180%)",
+  WebkitBackdropFilter: "blur(20px) saturate(180%)",
+} as React.CSSProperties;
+
+const cardStyle = {
+  border: "1.5px solid rgba(255, 255, 255, 0.95)",
+} as React.CSSProperties;
+
 interface Props {
   letters: PrayerLetter[];
 }
@@ -21,12 +31,13 @@ export default function ImageViewer({ letters }: Props) {
   }
 
   return (
-    <div className="grid grid-cols-2 gap-3 p-4" style={{ background: "rgba(255, 255, 255, 0.55)", backdropFilter: "blur(20px) saturate(180%)", WebkitBackdropFilter: "blur(20px) saturate(180%)" }}>
+    <div className="grid grid-cols-2 gap-3 p-4" style={glass}>
       {letters.map((letter) => (
         <Link
           key={letter.id}
           href={`/prayer-letters/${letter.id}`}
-          className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-white/60 shadow-sm active:scale-95 transition-transform block border border-white"
+          className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-white/60 shadow-sm active:scale-95 transition-transform block"
+          style={cardStyle}
         >
           <Image
             src={letter.src}
