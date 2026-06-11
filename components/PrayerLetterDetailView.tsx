@@ -9,6 +9,14 @@ import KakaoShareButton from "@/components/KakaoShareButton";
 export default function PrayerLetterDetailView({ letter }: { letter: PrayerLetter }) {
   const router = useRouter();
 
+  const handleClose = () => {
+    if (window.history.length > 1) {
+      router.back();
+    } else {
+      router.replace("/prayer-letters");
+    }
+  };
+
   return (
     <div
       className="fixed inset-0 z-[200] flex flex-col"
@@ -21,7 +29,7 @@ export default function PrayerLetterDetailView({ letter }: { letter: PrayerLette
       {/* 닫기 버튼 */}
       <div className="flex justify-end px-4 pt-12 pb-2 flex-shrink-0">
         <button
-          onClick={() => router.back()}
+          onClick={handleClose}
           className="w-10 h-10 flex items-center justify-center rounded-full bg-black/10 text-gray-700 active:bg-black/20 transition-colors"
         >
           <Xmark width={22} height={22} />
@@ -29,13 +37,13 @@ export default function PrayerLetterDetailView({ letter }: { letter: PrayerLette
       </div>
 
       {/* 이미지 */}
-      <div className="flex-1 relative min-h-0">
+      <div className="flex-1 min-h-0 overflow-y-auto flex items-start justify-center px-2">
         <Image
           src={letter.src}
           alt=""
-          fill
-          className="object-contain object-top"
-          sizes="100vw"
+          width={600}
+          height={900}
+          className="w-full h-auto object-contain"
           priority
         />
       </div>

@@ -8,7 +8,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const imagePath = path.join(process.cwd(), "public", "images", "prayer-letters", `${id}.jpeg`);
+  const imagePath = path.join(process.cwd(), "public", "images", "prayer-letters", `${id}.webp`);
 
   if (!fs.existsSync(imagePath)) {
     return new NextResponse("이미지를 찾을 수 없습니다", { status: 404 });

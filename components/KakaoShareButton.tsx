@@ -18,7 +18,7 @@ export default function KakaoShareButton({ src, letterId }: Props) {
   const handleShare = () => {
     if (typeof window === "undefined" || !window.Kakao?.isInitialized()) return;
 
-    const imageUrl = `https://mongolia-employment.vercel.app/api/thumbnail/${letterId}`;
+    const imageUrl = `https://mongolia-employment.vercel.app${src}`;
     const pageUrl = `https://mongolia-employment.vercel.app/prayer-letters/${letterId}`;
 
     window.Kakao.Share.sendDefault({
@@ -27,8 +27,8 @@ export default function KakaoShareButton({ src, letterId }: Props) {
         title: "몽골 선교 2026 기도편지",
         description: "함께 기도해 주세요 🙏",
         imageUrl,
-        imageWidth: 800,
-        imageHeight: 400,
+        imageWidth: 600,
+        imageHeight: 900,
         link: { mobileWebUrl: pageUrl, webUrl: pageUrl },
       },
       buttons: [
