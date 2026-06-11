@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Xmark } from "iconoir-react";
 import { type PrayerLetter } from "@/data/prayer-letters";
 import KakaoShareButton from "@/components/KakaoShareButton";
+import PrayerAnswerSection from "@/components/PrayerAnswerSection";
 
 export default function PrayerLetterDetailView({ letter }: { letter: PrayerLetter }) {
   const router = useRouter();
@@ -19,7 +20,7 @@ export default function PrayerLetterDetailView({ letter }: { letter: PrayerLette
 
   return (
     <div
-      className="fixed inset-0 z-[200] flex flex-col"
+      className="fixed inset-0 z-[9999] flex flex-col"
       style={{
         background: "rgba(255, 255, 255, 0.72)",
         backdropFilter: "blur(24px) saturate(180%)",
@@ -36,21 +37,24 @@ export default function PrayerLetterDetailView({ letter }: { letter: PrayerLette
         </button>
       </div>
 
-      {/* 이미지 */}
-      <div className="flex-1 min-h-0 overflow-y-auto flex items-start justify-center px-2">
-        <Image
-          src={letter.src}
-          alt=""
-          width={600}
-          height={900}
-          className="w-full h-auto object-contain"
-          priority
-        />
-      </div>
+      {/* 스크롤 영역: 이미지 + 공유버튼 + 기도응답 */}
+      <div className="flex-1 min-h-0 overflow-y-auto pb-24 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="flex justify-center px-2 pt-2">
+          <Image
+            src={letter.src}
+            alt=""
+            width={600}
+            height={900}
+            className="w-full h-auto object-contain"
+            priority
+          />
+        </div>
 
-      {/* 공유 버튼 */}
-      <div className="flex-shrink-0 px-6 pt-4 pb-10">
-        <KakaoShareButton src={letter.src} letterId={letter.id} />
+        <div className="px-6 pt-4 pb-2">
+          <KakaoShareButton src={letter.src} letterId={letter.id} />
+        </div>
+
+        <PrayerAnswerSection letterId={letter.id} />
       </div>
     </div>
   );
