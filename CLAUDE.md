@@ -100,12 +100,91 @@ checklistAtom           // 체크리스트 체크 상태 Record<string, boolean>
 
 ---
 
-## 스타일링
+## 코드 스타일 규칙
+
+### 스타일링
 
 - 색상 팔레트: 그린(`#16A34A`) + 베이지(`#FAFAF5`) 기조 — `globals.css`의 `@theme`에 정의
 - 모바일 전용 (375px 기준). 데스크탑 대응 불필요
 - 전 페이지 `pb-20` — `layout.tsx`의 `<main>` 에 적용 (하단 네비 높이 확보)
 - shadcn 컴포넌트는 `components/ui/`에 수동 작성. 새 컴포넌트 추가 시 `cn()` 유틸 사용
+
+### Glass Morphism 패턴
+
+프로젝트 전체에서 유리 질감 UI를 일관되게 사용한다. 새 컴포넌트 작성 시 아래 패턴을 따를 것.
+
+```tsx
+// 배경 (카드, 오버레이 등)
+style={{
+  background: "rgba(255, 255, 255, 0.72)",
+  backdropFilter: "blur(24px) saturate(180%)",
+  WebkitBackdropFilter: "blur(24px) saturate(180%)",  // iOS Safari 필수
+  borderColor: "rgba(255, 255, 255, 0.8)",
+}}
+```
+
+- `backdropFilter`와 `WebkitBackdropFilter`는 **반드시 쌍으로** 작성 (iOS Safari 15 이하 대응)
+- `backdrop-filter`를 인라인 style로 쓸 경우, 해당 요소가 `position: fixed` 자식의 **조상**이 되면 안 됨 → Tailwind `lg:` 반응형 클래스로 분리하거나 구조 변경
+
+### Tailwind v4 작성 규칙
+
+- `tailwind.config.ts` 없음. 커스텀 색상/값은 `globals.css`의 `@theme {}` 블록에 정의
+- arbitrary property: `[property:value]` 문법 사용 (예: `[scrollbar-width:none]`)
+- 반응형 arbitrary: `lg:[property:value]` 형태로 작성
+
+---
+
+## 크로스 브라우징 규칙 (iOS Safari / Android Chrome)
+
+이 앱의 주 타겟은 **iOS Safari**와 **Android Chrome** 모바일 브라우저다.  
+카카오톡 인앱 브라우저, 삼성 인터넷 브라우저에서도 동작해야 한다.
+
+### ❌ 금지 패턴
+
+| 패턴 | 이유 | 대안 |
+|------|------|------|
+| `position: fixed` 조상에 `backdrop-filter` / `transform` / `filter` 인라인 적용 | Android Chrome에서 fixed 자식의 containing block이 뷰포트가 아닌 해당 조상이 됨 | `lg:` 클래스로 데스크탑 전용 적용 |
+| `fetch` + `<a>.click()` 파일 다운로드 | iOS Safari 보안 정책으로 완전 차단 | iOS 감지 후 alert 안내로 분기 |
+| `window.history.length`로 이전 페이지 여부 판단 | 카카오 인앱 브라우저 등에서 신뢰 불가 | `document.referrer`로 same-origin 확인 |
+| `localStorage` 예외처리 없이 직접 접근 | iOS Safari Private Mode에서 `SecurityError` | try-catch로 감싸기 |
+
+### ✅ 필수 패턴
+
+**safe-area (노치/홈바 대응)**
+
+`layout.tsx`에 `export const viewport = { viewportFit: "cover" }` 가 선언되어 있어야 `env(safe-area-inset-*)` 값이 0이 아닌 실제 값을 반환한다.
+
+```tsx
+// 하단 고정 요소 (BottomNav 등)
+style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+
+// 상단 고정 오버레이 닫기 버튼 등
+style={{ paddingTop: "calc(env(safe-area-inset-top) + 12px)" }}
+```
+
+**iOS 감지**
+
+```tsx
+const isIOS = () =>
+  typeof navigator !== "undefined" && /iPad|iPhone|iPod/.test(navigator.userAgent);
+```
+
+**뒤로가기 (인앱 브라우저 안전)**
+
+```tsx
+const isSameOrigin =
+  document.referrer && new URL(document.referrer).origin === window.location.origin;
+if (isSameOrigin) { router.back(); } else { router.replace("/이전경로"); }
+```
+
+**외부 SDK 초기화 전 호출 방어**
+
+```tsx
+if (!window.Kakao?.isInitialized()) {
+  alert("준비 중입니다. 잠시 후 다시 시도해 주세요.");
+  return;
+}
+```
 
 ---
 
