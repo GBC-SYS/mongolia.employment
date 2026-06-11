@@ -7,6 +7,12 @@ import { Playfair_Display } from "next/font/google";
 
 const playfair = Playfair_Display({ subsets: ["latin"], weight: ["700"] });
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
+
 export const metadata: Metadata = {
   title: "몽골 선교 2026",
   description: "몽골 선교 2026 기도편지 함께 기도해 주세요 🙏",

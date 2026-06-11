@@ -58,7 +58,10 @@ export default function PrayerLetterDetailView({ letter }: { letter: PrayerLette
       }}
     >
       {/* 닫기 버튼 */}
-      <div className="flex justify-end px-4 pt-12 pb-2 flex-shrink-0">
+      <div
+        className="flex justify-end px-4 pb-2 flex-shrink-0"
+        style={{ paddingTop: "calc(env(safe-area-inset-top) + 12px)" }}
+      >
         <button
           onClick={handleClose}
           className="w-10 h-10 flex items-center justify-center rounded-full bg-black/10 text-gray-700 active:bg-black/20 transition-colors"

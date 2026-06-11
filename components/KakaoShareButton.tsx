@@ -16,7 +16,10 @@ interface Props {
 
 export default function KakaoShareButton({ src, letterId }: Props) {
   const handleShare = () => {
-    if (typeof window === "undefined" || !window.Kakao?.isInitialized()) return;
+    if (typeof window === "undefined" || !window.Kakao?.isInitialized()) {
+      alert("카카오 공유를 준비 중입니다. 잠시 후 다시 시도해 주세요.");
+      return;
+    }
 
     const imageUrl = `https://mongolia-employment.vercel.app${src}`;
     const pageUrl = `https://mongolia-employment.vercel.app/prayer-letters/${letterId}`;

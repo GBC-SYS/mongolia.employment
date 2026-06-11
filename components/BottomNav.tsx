@@ -22,6 +22,7 @@ export default function BottomNav() {
         backdropFilter: "blur(24px) saturate(180%)",
         WebkitBackdropFilter: "blur(24px) saturate(180%)",
         borderColor: "rgba(255, 255, 255, 0.8)",
+        paddingBottom: "env(safe-area-inset-bottom)",
       }}
     >
       <div className="flex">
