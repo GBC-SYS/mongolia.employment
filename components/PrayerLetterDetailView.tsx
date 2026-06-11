@@ -7,10 +7,17 @@ import { type PrayerLetter } from "@/data/prayer-letters";
 import KakaoShareButton from "@/components/KakaoShareButton";
 import PrayerAnswerSection from "@/components/PrayerAnswerSection";
 
+const isIOS = () =>
+  typeof navigator !== "undefined" && /iPad|iPhone|iPod/.test(navigator.userAgent);
+
 export default function PrayerLetterDetailView({ letter }: { letter: PrayerLetter }) {
   const router = useRouter();
 
   const handleDownload = async () => {
+    if (isIOS()) {
+      alert("이미지를 길게 눌러 '사진에 저장'을 선택해 주세요.");
+      return;
+    }
     try {
       const res = await fetch(letter.src);
       const blob = await res.blob();
@@ -18,7 +25,9 @@ export default function PrayerLetterDetailView({ letter }: { letter: PrayerLette
       const a = document.createElement("a");
       a.href = url;
       a.download = `기도편지-${letter.id}.webp`;
+      document.body.appendChild(a);
       a.click();
+      document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } catch {
       window.open(letter.src, "_blank");
@@ -26,9 +35,15 @@ export default function PrayerLetterDetailView({ letter }: { letter: PrayerLette
   };
 
   const handleClose = () => {
-    if (window.history.length > 1) {
-      router.back();
-    } else {
+    try {
+      const isSameOrigin =
+        document.referrer && new URL(document.referrer).origin === window.location.origin;
+      if (isSameOrigin) {
+        router.back();
+      } else {
+        router.replace("/prayer-letters");
+      }
+    } catch {
       router.replace("/prayer-letters");
     }
   };
@@ -75,7 +90,9 @@ export default function PrayerLetterDetailView({ letter }: { letter: PrayerLette
               <DownloadCircle width={18} height={18} />
               이미지 저장
             </span>
-            <span className="text-xs text-gray-400">아이폰은 이미지를 길게 눌러 저장하세요</span>
+            <span className="text-xs text-gray-400">
+              {isIOS() ? "이미지를 길게 눌러 저장하세요" : "이미지를 기기에 저장합니다"}
+            </span>
           </button>
         </div>
 
