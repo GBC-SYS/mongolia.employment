@@ -50,7 +50,7 @@ export default function HomePage() {
         {/* 성경 말씀 */}
         <Card className="border-0 rounded-2xl overflow-hidden">
           <CardContent className="pt-4 pb-4">
-            <p className="text-gray-800 text-sm leading-relaxed font-medium italic">
+            <p className="text-gray-800 text-sm leading-relaxed font-medium">
               "좋은 소식을 전하며 평화를 공포하며 복된 좋은 소식을 가져오며 구원을 공포하며 시온을 향하여 이르기를 네 하나님이 통치하신다 하는 자의 산을 넘는 발이 어찌 그리 아름다운고"
             </p>
             <p className="text-xs mt-2 font-semibold" style={{ color: brandDark }}>이사야 52:7 (개역개정)</p>
