@@ -100,7 +100,7 @@ export default function RootLayout({
                     textShadow: "1px 1px 0 black",
                   }}
                 >
-                  God So Loved<br />The World.
+                  God So Loved<br />The World
                 </h1>
                 <div className="flex items-center gap-2 mb-5">
                   <div className="h-px w-10 opacity-50" style={{ background: "#FCDD4F" }} />

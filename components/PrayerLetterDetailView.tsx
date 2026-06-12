@@ -84,7 +84,7 @@ export default function PrayerLetterDetailView({ letter }: { letter: PrayerLette
         </div>
 
         <div className="px-6 pt-4 pb-2 space-y-2">
-          <KakaoShareButton src={letter.src} letterId={letter.id} />
+          <KakaoShareButton letterId={letter.id} />
           <button
             onClick={handleDownload}
             className="w-full flex flex-col items-center justify-center gap-0.5 bg-gray-800 text-white py-3 rounded-2xl active:scale-95 transition-transform"

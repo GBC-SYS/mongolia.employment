@@ -9,20 +9,21 @@ declare global {
   }
 }
 
+const BASE_URL = "https://mongolia-employment.vercel.app";
+
 interface Props {
-  src: string;
   letterId: string;
 }
 
-export default function KakaoShareButton({ src, letterId }: Props) {
+export default function KakaoShareButton({ letterId }: Props) {
   const handleShare = () => {
     if (typeof window === "undefined" || !window.Kakao?.isInitialized()) {
       alert("카카오 공유를 준비 중입니다. 잠시 후 다시 시도해 주세요.");
       return;
     }
 
-    const imageUrl = `https://mongolia-employment.vercel.app${src}`;
-    const pageUrl = `https://mongolia-employment.vercel.app/prayer-letters/${letterId}`;
+    const imageUrl = `${BASE_URL}/images/thumbnail2.webp`;
+    const pageUrl = `${BASE_URL}/prayer-letters/${letterId}`;
 
     window.Kakao.Share.sendDefault({
       objectType: "feed",
@@ -30,8 +31,8 @@ export default function KakaoShareButton({ src, letterId }: Props) {
         title: "몽골 선교 2026 기도편지",
         description: "함께 기도해 주세요 🙏",
         imageUrl,
-        imageWidth: 600,
-        imageHeight: 900,
+        imageWidth: 1457,
+        imageHeight: 720,
         link: { mobileWebUrl: pageUrl, webUrl: pageUrl },
       },
       buttons: [
