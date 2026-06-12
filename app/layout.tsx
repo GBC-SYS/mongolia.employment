@@ -9,7 +9,7 @@ import localFont from "next/font/local";
 const playfair = Playfair_Display({ subsets: ["latin"], weight: ["700"] });
 
 const pretendard = localFont({
-  src: "../node_modules/pretendard/dist/web/variable/woff2/PretendardVariable.woff2",
+  src: "../public/fonts/PretendardVariable.woff2",
   display: "swap",
   weight: "45 920",
   variable: "--font-pretendard",
