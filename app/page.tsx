@@ -44,6 +44,9 @@ export default function HomePage() {
       </div>
 
       <div className="flex flex-col gap-3 px-4 py-4">
+        {/* 카운트다운 */}
+        <Countdown />
+
         {/* 성경 말씀 */}
         <Card className="border-0 rounded-2xl overflow-hidden">
           <CardContent className="pt-4 pb-4">
@@ -63,9 +66,6 @@ export default function HomePage() {
             </p>
           </CardContent>
         </Card>
-
-        {/* 카운트다운 */}
-        <Countdown />
 
         {/* 빠른 진입 카드 */}
         <div className="grid grid-cols-2 gap-3">
