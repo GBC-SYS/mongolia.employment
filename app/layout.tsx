@@ -4,8 +4,16 @@ import Image from "next/image";
 import BottomNav from "@/components/BottomNav";
 import RecoilProvider from "@/components/RecoilProvider";
 import { Playfair_Display } from "next/font/google";
+import localFont from "next/font/local";
 
 const playfair = Playfair_Display({ subsets: ["latin"], weight: ["700"] });
+
+const pretendard = localFont({
+  src: "../node_modules/pretendard/dist/web/variable/woff2/PretendardVariable.woff2",
+  display: "swap",
+  weight: "45 920",
+  variable: "--font-pretendard",
+});
 
 export const viewport = {
   width: "device-width",
@@ -31,7 +39,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" className="h-full">
+    <html lang="ko" className={`h-full ${pretendard.variable}`}>
       {/*
         모바일: body 전체가 앱
         데스크탑: 왼쪽 장식 패널 + 오른쪽 390px 앱 패널 (flex)
