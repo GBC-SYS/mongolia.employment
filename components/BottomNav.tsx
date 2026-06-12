@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Mail, Book, MusicNote } from "iconoir-react";
+import { Home, Mail, Book, MusicNote, Heart } from "iconoir-react";
 
 const navItems = [
   { href: "/", label: "홈", Icon: Home },
   { href: "/prayer-letters", label: "기도편지", Icon: Mail },
+  { href: "/group-prayer", label: "공동기도", Icon: Heart },
   { href: "/song", label: "합창곡", Icon: MusicNote },
   { href: "/guide", label: "가이드", Icon: Book },
 ];
