@@ -1,7 +1,7 @@
 "use client";
 
 import { useAtom } from "jotai";
-import { NavArrowDown } from "iconoir-react";
+import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { guideOpenSectionsAtom } from "@/store/atoms";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -38,7 +38,7 @@ export default function GuideAccordion({ sectionKey, title, emoji, children }: P
           <span className="text-2xl">{emoji}</span>
           <span className="font-semibold text-gray-900">{title}</span>
         </div>
-        <NavArrowDown
+        <ChevronDownIcon
           width={18}
           height={18}
           className={cn(

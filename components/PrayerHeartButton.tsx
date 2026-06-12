@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Heart } from "iconoir-react";
+import { HeartIcon } from "@heroicons/react/24/outline";
 
 const STORAGE_KEY = "prayer_heart_clicked";
 
@@ -40,10 +40,9 @@ export default function PrayerHeartButton({ initialCount = 0 }: { initialCount?:
       className="flex items-center gap-1.5 transition-transform active:scale-90"
       aria-label="기도해요"
     >
-      <Heart
+      <HeartIcon
         width={22}
         height={22}
-        strokeWidth={1.8}
         className={clicked ? "fill-rose-500 text-rose-500" : "text-gray-400"}
       />
       <span className={`text-sm font-semibold tabular-nums ${clicked ? "text-rose-500" : "text-gray-400"}`}>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Calendar } from "iconoir-react";
+import { CalendarIcon } from "@heroicons/react/24/outline";
 import { Card } from "@/components/ui/card";
 
 const MISSION_START = new Date("2026-06-28T00:00:00+09:00");
@@ -51,7 +51,7 @@ export default function Countdown() {
     return (
       <Card className="px-6 py-4 text-center border-0 rounded-2xl" style={glass}>
         <div className="flex items-center justify-center gap-1.5 text-gray-500 text-sm mb-1">
-          <Calendar width={14} height={14} />
+          <CalendarIcon width={14} height={14} />
           <span>출발까지</span>
         </div>
         <p className="text-5xl font-bold" style={{ color: brandDark }}>D-{daysLeft}</p>
@@ -64,7 +64,7 @@ export default function Countdown() {
     return (
       <Card className="px-6 py-4 text-center border-0 rounded-2xl" style={{ ...glass, background: "rgba(22, 101, 52, 0.08)" }}>
         <div className="flex items-center justify-center gap-1.5 text-sm mb-1" style={{ color: brandDark }}>
-          <Calendar width={14} height={14} />
+          <CalendarIcon width={14} height={14} />
           <span>몽골 사역 중</span>
         </div>
         <p className="text-5xl font-bold" style={{ color: brandDark }}>{missionDay}일차</p>

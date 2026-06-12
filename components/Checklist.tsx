@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useAtom } from "jotai";
-import { Check } from "iconoir-react";
+import { CheckIcon } from "@heroicons/react/24/outline";
 import { checklistAtom } from "@/store/atoms";
 import { checklistData } from "@/data/guide-content";
 import { cn } from "@/lib/utils";
@@ -73,7 +73,7 @@ export default function Checklist() {
                       )}
                     >
                       {isChecked && (
-                        <Check width={11} height={11} className="text-white" strokeWidth={3} />
+                        <CheckIcon width={11} height={11} className="text-white" strokeWidth={3} />
                       )}
                     </span>
                     <span

@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Xmark, DownloadCircle } from "iconoir-react";
+import { XMarkIcon, ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 import { type PrayerLetter } from "@/data/prayer-letters";
 import KakaoShareButton from "@/components/KakaoShareButton";
 import PrayerAnswerSection from "@/components/PrayerAnswerSection";
@@ -66,7 +66,7 @@ export default function PrayerLetterDetailView({ letter }: { letter: PrayerLette
           onClick={handleClose}
           className="w-10 h-10 flex items-center justify-center rounded-full bg-black/10 text-gray-700 active:bg-black/20 transition-colors"
         >
-          <Xmark width={22} height={22} />
+          <XMarkIcon width={22} height={22} />
         </button>
       </div>
 
@@ -90,7 +90,7 @@ export default function PrayerLetterDetailView({ letter }: { letter: PrayerLette
             className="w-full flex flex-col items-center justify-center gap-0.5 bg-gray-800 text-white py-3 rounded-2xl active:scale-95 transition-transform"
           >
             <span className="flex items-center gap-2 text-sm font-semibold">
-              <DownloadCircle width={18} height={18} />
+              <ArrowDownTrayIcon width={18} height={18} />
               이미지 저장
             </span>
             <span className="text-xs text-gray-400">

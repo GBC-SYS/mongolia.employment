@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Mail } from "iconoir-react";
+import { EnvelopeIcon } from "@heroicons/react/24/outline";
 import { type PrayerLetter } from "@/data/prayer-letters";
 
 const cardStyle = {
@@ -15,7 +15,7 @@ export default function ImageViewer({ letters }: Props) {
   if (letters.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 gap-3 text-gray-400">
-        <Mail width={48} height={48} strokeWidth={1} />
+        <EnvelopeIcon width={48} height={48} strokeWidth={1} />
         <p className="text-sm">아직 기도편지가 없습니다</p>
         <p className="text-xs text-gray-400">
           public/images/prayer-letters/ 폴더에 이미지를 추가하세요

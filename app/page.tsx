@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Mail, Book, Calendar, MusicNote, Heart } from "iconoir-react";
+import { EnvelopeIcon, BookOpenIcon, CalendarIcon, MusicalNoteIcon, HeartIcon } from "@heroicons/react/24/outline";
 import Countdown from "@/components/Countdown";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -64,7 +64,7 @@ export default function HomePage() {
             className="rounded-2xl p-5 flex flex-col gap-3 active:scale-95 transition-transform"
             style={cardGlass}
           >
-            <Mail width={28} height={28} strokeWidth={1.5} style={{ color: brand }} />
+            <EnvelopeIcon width={28} height={28} strokeWidth={1.5} style={{ color: brand }} />
             <div>
               <p className="font-semibold text-gray-900">기도편지</p>
               <p className="text-gray-500 text-xs mt-0.5">선교팀 소식 보기</p>
@@ -75,7 +75,7 @@ export default function HomePage() {
             className="rounded-2xl p-5 flex flex-col gap-3 active:scale-95 transition-transform"
             style={cardGlass}
           >
-            <Book width={28} height={28} strokeWidth={1.5} style={{ color: brand }} />
+            <BookOpenIcon width={28} height={28} strokeWidth={1.5} style={{ color: brand }} />
             <div>
               <p className="font-semibold text-gray-900">가이드북</p>
               <p className="text-gray-500 text-xs mt-0.5">준비물 &amp; 안전수칙</p>
@@ -89,7 +89,7 @@ export default function HomePage() {
           className="rounded-2xl p-5 flex items-center gap-4 active:scale-95 transition-transform"
           style={cardGlass}
         >
-          <MusicNote width={28} height={28} strokeWidth={1.5} style={{ color: brand }} />
+          <MusicalNoteIcon width={28} height={28} strokeWidth={1.5} style={{ color: brand }} />
           <div className="flex-1">
             <p className="font-semibold text-gray-900">합창곡</p>
             <p className="text-gray-500 text-xs mt-0.5">한·몽 가사 보기</p>
@@ -103,7 +103,7 @@ export default function HomePage() {
           className="rounded-2xl p-5 flex items-center gap-4 active:scale-95 transition-transform"
           style={cardGlass}
         >
-          <Heart width={28} height={28} strokeWidth={1.5} style={{ color: brand }} />
+          <HeartIcon width={28} height={28} strokeWidth={1.5} style={{ color: brand }} />
           <div className="flex-1">
             <p className="font-semibold text-gray-900">공동 기도제목</p>
             <p className="text-gray-500 text-xs mt-0.5">함께 기도해요</p>
@@ -124,7 +124,7 @@ export default function HomePage() {
         <Card className="border-0 rounded-2xl">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-gray-900">
-              <Calendar width={18} height={18} style={{ color: brand }} />
+              <CalendarIcon width={18} height={18} style={{ color: brand }} />
               선교 일정
             </CardTitle>
           </CardHeader>

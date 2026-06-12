@@ -2,7 +2,7 @@ import GuideAccordion from "@/components/GuideAccordion";
 import Checklist from "@/components/Checklist";
 import ClientOnly from "@/components/ClientOnly";
 import { weatherData, safetyData, emergencyData } from "@/data/guide-content";
-import { Phone, WarningTriangle } from "iconoir-react";
+import { PhoneIcon, ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 
 export const dynamic = "force-dynamic";
 
@@ -90,7 +90,7 @@ export default function GuidePage() {
                   <span className={`text-sm ${c.highlight ? "text-red-600 font-medium" : "text-gray-700"}`}>
                     {c.label}
                   </span>
-                  <Phone
+                  <PhoneIcon
                     width={16}
                     height={16}
                     className={c.highlight ? "text-red-500" : "text-gray-400"}
@@ -105,7 +105,7 @@ export default function GuidePage() {
           {/* 현지 긴급 */}
           <div className="mb-4">
             <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1.5">
-              <WarningTriangle width={15} height={15} className="text-amber-500" />
+              <ExclamationTriangleIcon width={15} height={15} className="text-amber-500" />
               몽골 현지 긴급신고
             </h4>
             <div className="grid grid-cols-3 gap-2">

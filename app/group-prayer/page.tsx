@@ -5,7 +5,7 @@
 // 정적 콘텐츠이므로 force-dynamic 불필요
 
 import React, { useState } from "react";
-import { Heart, Copy, CheckCircle } from "iconoir-react";
+import { HeartIcon, ClipboardDocumentIcon, CheckCircleIcon } from "@heroicons/react/24/outline";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
@@ -72,7 +72,7 @@ export default function GroupPrayerPage() {
         style={{ borderBottom: "1px solid rgba(255, 255, 255, 0.95)" }}
       >
         <div className="flex items-center gap-2 mb-1">
-          <Heart width={18} height={18} strokeWidth={1.5} style={{ color: brand }} />
+          <HeartIcon width={18} height={18} strokeWidth={1.5} style={{ color: brand }} />
           <p className="text-sm font-medium" style={{ color: brandDark }}>
             2026 나감 2000
           </p>
@@ -129,12 +129,12 @@ export default function GroupPrayerPage() {
               >
                 {copied ? (
                   <>
-                    <CheckCircle width={15} height={15} strokeWidth={2} />
+                    <CheckCircleIcon width={15} height={15} strokeWidth={2} />
                     복사됨
                   </>
                 ) : (
                   <>
-                    <Copy width={15} height={15} strokeWidth={1.8} />
+                    <ClipboardDocumentIcon width={15} height={15} strokeWidth={1.8} />
                     복사
                   </>
                 )}
@@ -150,7 +150,7 @@ export default function GroupPrayerPage() {
         <Card className="border-0 rounded-2xl" style={cardGlass}>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-gray-900">
-              <Heart width={18} height={18} strokeWidth={1.5} style={{ color: brand }} />
+              <HeartIcon width={18} height={18} strokeWidth={1.5} style={{ color: brand }} />
               몽골 선교팀 공동 기도제목
             </CardTitle>
           </CardHeader>
