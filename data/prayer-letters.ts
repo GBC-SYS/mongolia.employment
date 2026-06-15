@@ -35,5 +35,6 @@ export const prayerLetters: PrayerLetter[] = [
   { id: "027", src: "/images/prayer-letters/027.webp", title: "기도편지 27", date: "2026년 6월" },
   { id: "028", src: "/images/prayer-letters/028.webp", title: "기도편지 28", date: "2026년 6월" },
   { id: "029", src: "/images/prayer-letters/029.webp", title: "기도편지 29", date: "2026년 6월" },
-  { id: "300", src: "/images/prayer-letters/300.webp", title: "기도편지 30", date: "2026년 6월" },
+  { id: "030", src: "/images/prayer-letters/030.webp", title: "기도편지 30", date: "2026년 6월" },
+  { id: "031", src: "/images/prayer-letters/031.webp", title: "기도편지 31", date: "2026년 6월" },
 ];
