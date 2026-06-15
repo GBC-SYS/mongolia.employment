@@ -54,6 +54,11 @@ export default function Checklist() {
               <span>{cat.emoji}</span>
               {cat.name}
             </h4>
+            {"note" in cat && cat.note && (
+              <p className="text-xs text-[#166534] bg-green-50 rounded-lg px-3 py-2 mb-1 leading-relaxed">
+                ℹ️ {cat.note}
+              </p>
+            )}
             <div className="flex flex-col gap-2">
               {cat.items.map((item) => {
                 const key = `${cat.name}-${item}`;
