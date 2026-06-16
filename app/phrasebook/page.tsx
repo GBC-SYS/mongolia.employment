@@ -3,11 +3,11 @@
 export const dynamic = "force-dynamic";
 
 import { useAtom } from "jotai";
-import { ArrowsPointingOutIcon } from "@heroicons/react/24/outline";
+import { useRef, useState } from "react";
+import { SpeakerWaveIcon } from "@heroicons/react/24/outline";
 import GuideAccordion from "@/components/GuideAccordion";
-import PhraseEnlargeModal from "@/components/PhraseEnlargeModal";
 import { phrasebookData } from "@/data/phrasebook";
-import { phrasebookOpenSectionsAtom, enlargedPhraseAtom } from "@/store/atoms";
+import { phrasebookOpenSectionsAtom } from "@/store/atoms";
 
 const brandDark = "#14532d";
 
@@ -19,7 +19,76 @@ const glass = {
 
 function PhrasebookContent() {
   const [openSections, setOpenSections] = useAtom(phrasebookOpenSectionsAtom);
-  const [, setEnlarged] = useAtom(enlargedPhraseAtom);
+  const [playingKey, setPlayingKey] = useState<string | null>(null);
+  const [playingWordIdx, setPlayingWordIdx] = useState<number>(-1);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const stopAll = () => {
+    if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
+    audioRef.current?.pause();
+    audioRef.current = null;
+    if (typeof window !== "undefined") window.speechSynthesis?.cancel();
+    setPlayingKey(null);
+    setPlayingWordIdx(-1);
+  };
+
+  const playAudio = (src: string, pron: string, key: string) => {
+    stopAll();
+    if (playingKey === key) return;
+    const audio = new Audio(src);
+    audioRef.current = audio;
+    const pronWords = pron.trim().split(/\s+/);
+    setPlayingKey(key);
+    setPlayingWordIdx(0);
+    // 오디오 길이 확정 후 단어별 구간 계산
+    audio.addEventListener("loadedmetadata", () => {
+      const wordDuration = audio.duration / pronWords.length;
+      intervalRef.current = setInterval(() => {
+        const idx = Math.min(Math.floor(audio.currentTime / wordDuration), pronWords.length - 1);
+        setPlayingWordIdx(idx);
+      }, 80);
+    });
+    audio.onended = () => {
+      if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
+      setPlayingKey(null);
+      setPlayingWordIdx(-1);
+    };
+    audio.play().catch(() => stopAll());
+  };
+
+  const speakMongolian = (mn: string, pron: string, key: string) => {
+    if (typeof window === "undefined" || !window.speechSynthesis) return;
+    stopAll();
+    if (playingKey === key) return;
+    const utterance = new SpeechSynthesisUtterance(mn);
+    utterance.lang = "mn-MN";
+    utterance.rate = 0.82;
+    const voices = window.speechSynthesis.getVoices();
+    const mnVoice = voices.find((v) => v.lang.startsWith("mn"));
+    if (mnVoice) utterance.voice = mnVoice;
+    const pronWords = pron.trim().split(/\s+/);
+    let wordCount = 0;
+    utterance.onboundary = (e) => {
+      if (e.name === "word" && wordCount < pronWords.length) {
+        setPlayingWordIdx(wordCount);
+        wordCount++;
+      }
+    };
+    utterance.onend = () => { setPlayingKey(null); setPlayingWordIdx(-1); };
+    utterance.onerror = () => { setPlayingKey(null); setPlayingWordIdx(-1); };
+    setPlayingKey(key);
+    setPlayingWordIdx(0);
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const handleAudio = (phrase: { mn: string; pron: string; audio?: string }, key: string) => {
+    if (phrase.audio) {
+      playAudio(phrase.audio, phrase.pron, key);
+    } else {
+      speakMongolian(phrase.mn, phrase.pron, key);
+    }
+  };
 
   return (
     <>
@@ -39,56 +108,87 @@ function PhrasebookContent() {
               onToggle={toggle}
             >
               <div className="flex flex-col gap-2">
-                {section.phrases.map((phrase, i) => (
-                  <div
-                    key={i}
-                    className="rounded-xl px-4 py-3"
-                    style={{ background: "rgba(255,255,255,0.65)" }}
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          {section.numbered && (
-                            <span
-                              className="flex-shrink-0 w-5 h-5 text-xs font-bold rounded-full flex items-center justify-center border"
-                              style={{
-                                background: "rgba(22,101,52,0.1)",
-                                color: brandDark,
-                                borderColor: "rgba(22,101,52,0.3)",
-                              }}
-                            >
-                              {i + 1}
-                            </span>
-                          )}
-                          <p className="text-xs text-gray-500 leading-relaxed">{phrase.ko}</p>
+                {section.phrases.map((phrase, i) => {
+                  const audioKey = `${section.key}_${i}`;
+                  const isPlaying = playingKey === audioKey;
+                  return (
+                    <div
+                      key={i}
+                      className="rounded-xl px-4 py-3"
+                      style={{ background: "rgba(255,255,255,0.65)" }}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            {section.numbered && (
+                              <span
+                                className="flex-shrink-0 w-5 h-5 text-xs font-bold rounded-full flex items-center justify-center border"
+                                style={{
+                                  background: "rgba(22,101,52,0.1)",
+                                  color: brandDark,
+                                  borderColor: "rgba(22,101,52,0.3)",
+                                }}
+                              >
+                                {i + 1}
+                              </span>
+                            )}
+                            <p className="text-xs text-gray-500 leading-relaxed">{phrase.ko}</p>
+                          </div>
+                          <p className="text-sm font-semibold text-gray-900 leading-snug mb-1">
+                            {phrase.mn}
+                          </p>
+                          <p className="text-xs leading-relaxed">
+                            {isPlaying
+                              ? phrase.pron.trim().split(/\s+/).map((word, wi) => (
+                                  <span
+                                    key={wi}
+                                    className="transition-all duration-150"
+                                    style={
+                                      wi === playingWordIdx
+                                        ? {
+                                            background: "linear-gradient(120deg, #bbf7d0 0%, #86efac 100%)",
+                                            color: "#14532d",
+                                            fontWeight: 700,
+                                            borderRadius: "3px",
+                                            padding: "1px 3px",
+                                          }
+                                        : { color: "#9ca3af" }
+                                    }
+                                  >
+                                    {word}{" "}
+                                  </span>
+                                ))
+                              : <span style={{ color: "#9ca3af" }}>{phrase.pron}</span>
+                            }
+                          </p>
                         </div>
-                        <p className="text-sm font-semibold text-gray-900 leading-snug mb-1">
-                          {phrase.mn}
-                        </p>
-                        <p className="text-xs text-gray-400 leading-relaxed">{phrase.pron}</p>
+                        {(phrase.audio || section.key === "gospel") && (
+                          <button
+                            onClick={() => handleAudio(phrase, audioKey)}
+                            className="flex-shrink-0 p-2 rounded-lg active:scale-90 transition-all"
+                            style={{
+                              background: isPlaying
+                                ? "rgba(22,101,52,0.85)"
+                                : "rgba(22,101,52,0.1)",
+                            }}
+                            aria-label="발음 듣기"
+                          >
+                            <SpeakerWaveIcon
+                              width={16}
+                              height={16}
+                              style={{ color: isPlaying ? "#fff" : brandDark }}
+                            />
+                          </button>
+                        )}
                       </div>
-                      <button
-                        onClick={() => setEnlarged({ mn: phrase.mn, pron: phrase.pron })}
-                        className="flex-shrink-0 p-2 rounded-lg active:scale-90 transition-transform"
-                        style={{ background: "rgba(22,101,52,0.1)" }}
-                        aria-label="크게 보기"
-                      >
-                        <ArrowsPointingOutIcon
-                          width={16}
-                          height={16}
-                          strokeWidth={2}
-                          style={{ color: brandDark }}
-                        />
-                      </button>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </GuideAccordion>
           );
         })}
       </div>
-      <PhraseEnlargeModal />
     </>
   );
 }

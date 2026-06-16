@@ -2,6 +2,7 @@ export interface Phrase {
   ko: string;
   mn: string;
   pron: string;
+  audio?: string; // /audio/phrasebook/{섹션키}_{인덱스}.mp3
 }
 
 export interface PhrasebookSection {
@@ -53,51 +54,61 @@ export const phrasebookData: PhrasebookSection[] = [
         ko: "하나님은 세상을 만드시고 사람을 만드셨습니다.",
         mn: "Бурхан ертөнцийг бүтээж, дараа нь хүнийг бүтээсэн.",
         pron: "부르항 예르툽치익 부텡쥬, 다라안 후닝 부텡셍",
+        audio: "/audio/phrasebook/gospel_0.mp3",
       },
       {
         ko: "하나님은 모든 사람이 천국에 가기를 원하십니다.",
         mn: "Мөн Бурхан бүх хүнийг диваажинд очоосой гэж хүсдэг.",
         pron: "믕 부르항 부흐 후니익 디와진드 오초-세- 게쥬 후스덱",
+        audio: "/audio/phrasebook/gospel_1.mp3",
       },
       {
         ko: "하지만 모든 인간은 죄인입니다.",
         mn: "Гэвч бүх хүн нүгэлтэн юм.",
         pron: "게브치 부흐 훙 누글텡 윰",
+        audio: "/audio/phrasebook/gospel_2.mp3",
       },
       {
         ko: "죄인은 천국에 가는 것이 불가능합니다.",
         mn: "Нүгэлт хүн диваажинд очих боломжгүй.",
         pron: "누글트 훙 디와진드 오치흐 볼름지구이",
+        audio: "/audio/phrasebook/gospel_3.mp3",
       },
       {
         ko: "그래서 예수님은 우리의 죄값을 치르기 위해 십자가에서 죽으셨습니다.",
         mn: "Тиймээс Есүс бидний нүглийн төлөөсийг төлөхийн тулд загалмай дээр нас барсан.",
         pron: "티메-세 예수-스 비드니 누글링 툘레-시익 툘러히- 투읻 자갈마이 데-르 나스 바르상",
+        audio: "/audio/phrasebook/gospel_4.mp3",
       },
       {
         ko: "그리고 3일 만에 부활하셨습니다.",
         mn: "Тэгээд Тэрээр гурав хоногийн дараа дахин амилсан.",
         pron: "테게-드 테레-르 구랍 호녹깅 다라- 다힝 아밀상",
+        audio: "/audio/phrasebook/gospel_5.mp3",
       },
       {
         ko: "예수님을 믿으면 천국에 갈 수 있습니다.",
         mn: "Есүст итгэвэл та диваажинд очиж чадна.",
         pron: "예수스트 잇게벨 타 디와진드 오치쥬 차드나",
+        audio: "/audio/phrasebook/gospel_6.mp3",
       },
       {
         ko: "예수님을 구원자로 영접하길 원하십니까?",
         mn: "Та Есүсийг өөрийн Аврагчаар хүлээн авахад бэлэн байна уу?",
         pron: "타 예수-시익 어-링 아우락차-르 훌렝 아와하드 벨렙 뱅 노?",
+        audio: "/audio/phrasebook/gospel_7.mp3",
       },
       {
         ko: "당신을 위해 기도해도 될까요?",
         mn: "Би таны төлөө залбирч болох уу?",
         pron: "비 타니 툘레- 잘비르치 볼로 후?",
+        audio: "/audio/phrasebook/gospel_8.mp3",
       },
       {
         ko: "예수님의 이름으로 기도했습니다. 아멘.",
         mn: "Есүсийн нэрээр залбирлаа. Амен.",
         pron: "예수싱 네레-르 잘비를라. 아멘",
+        audio: "/audio/phrasebook/gospel_9.mp3",
       },
     ],
   },

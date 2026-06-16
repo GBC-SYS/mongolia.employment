@@ -25,6 +25,7 @@
 | 중기 | iconoir-react → **heroicons** 마이그레이션 | BottomNav 슬라이딩 pill 디자인 적용, 아이콘 품질 개선 |
 | 중기 | **Upstash Redis** 도입 | 기도 하트(카운트) + 기도응답 저장 — 서버리스 환경에 적합 |
 | 중기 | **Pretendard** 고정 웨이트 9종 전체 적용 | next/font/local, public/fonts 경로, 한국어 줄바꿈 개선 |
+| 2026-06-16 | `GuideAccordion`에 `openOverride`/`onToggle` props 추가 | 구문집 전용 atom을 별도로 두면서도 기존 컴포넌트 재사용 필요 |
 
 ---
 
@@ -32,7 +33,7 @@
 
 - [x] Next.js 16 + Tailwind v4 + Jotai 프로젝트 초기 세팅
 - [x] Glass Morphism 디자인 시스템 정립 (`rgba(255,255,255,0.55)` + `backdropFilter`)
-- [x] `BottomNav` — 슬라이딩 pill 디자인, 5탭 (홈/기도편지/가이드북/합창곡/공동기도제목)
+- [x] `BottomNav` — 슬라이딩 pill 디자인, 6탭 (홈/기도편지/가이드북/합창곡/공동기도제목/전도 구문집)
 - [x] `ClientOnly` + `RecoilProvider(Jotai)` SSR 방지 구조
 - [x] shadcn 수동 컴포넌트: `Button`, `Card`, `Badge`
 - [x] Vercel 배포 파이프라인 (CI/CD, 환경변수 설정)
@@ -46,7 +47,7 @@
 - [x] D-Day 카운트다운 (출발일 2026-06-28 기준)
 - [x] 이사야 52:7 성경 말씀 카드
 - [x] 선교 일정 (6/28~7/4)
-- [x] 빠른 진입 카드 (기도편지 / 가이드북 / 합창곡 / 공동기도제목)
+- [x] 빠른 진입 카드 (기도편지 / 가이드북 / 합창곡 / 공동기도제목 / 전도 구문집)
 - [x] OG 썸네일 이미지 설정 (`thumbnail2.webp`)
 - [x] 카카오 공유 버튼 (`KakaoShareButton`)
 
@@ -71,6 +72,15 @@
 - [x] 10개 공동 기도제목 목록
 - [x] 후원 계좌 복사 버튼 (카카오뱅크, iOS Private Mode 대응)
 
+### 전도 구문집 (`/phrasebook`) — 2026-06-16 추가 (커밋 fe1e79d)
+- [x] 4개 섹션: 기본 인사 & 자기소개 / 축복 & 사랑의 표현 / 복음 핵심 메시지 / 일상 표현
+- [x] 복음 핵심 메시지 섹션 — 번호 있는 10단계 전도 시퀀스
+- [x] 구문 카드 "크게보기" 버튼 → 몽골어 전체화면 오버레이 (`PhraseEnlargeModal`)
+- [x] Jotai atoms 추가: `phrasebookOpenSectionsAtom`, `enlargedPhraseAtom` (`store/atoms.ts`)
+- [x] `GuideAccordion`에 `openOverride`/`onToggle` 선택적 props 추가 (별도 atom 재사용 가능)
+- [x] 외부 API 없는 순수 정적 구문집 — 오프라인 동작
+- [x] iOS safe-area, Android Chrome `backdrop-filter` 크로스브라우징 규칙 준수
+
 ---
 
 ## Phase 3 — 크로스 브라우징 및 품질 개선 ✅ 완료
@@ -86,7 +96,7 @@
 
 ## Phase 4 — 선교 기간 대응 🔄 진행 예정
 
-> **선교 시작 D-12** (2026-06-16 기준)
+> **선교 시작 D-12** (2026-06-16 기준) — 핵심 기능 구현 완료, 최종 QA 단계
 
 - [ ] 기도편지 이미지 추가 (선교 기간 중 실시간 업로드 대응)
 - [ ] 선교 현지 소식 업데이트 방안 검토 (정적 데이터 vs 동적)
@@ -126,4 +136,4 @@
 
 ## 총 커밋 수
 
-약 **50 commits** (2026-06-16 기준)
+약 **51+ commits** (2026-06-16 기준, 전도 구문집 fe1e79d 포함)
