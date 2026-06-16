@@ -11,3 +11,12 @@ export const guideOpenSectionsAtom = atom<Record<string, boolean>>({
 });
 
 export const checklistAtom = atom<Record<string, boolean>>({});
+
+export const phrasebookOpenSectionsAtom = atom<Record<string, boolean>>({
+  greeting: true,
+  blessing: true,
+  gospel: true,
+  daily: false,
+});
+
+export const enlargedPhraseAtom = atom<{ mn: string; pron: string } | null>(null);

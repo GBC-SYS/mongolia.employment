@@ -11,14 +11,16 @@ interface Props {
   title: string;
   emoji: string;
   children: React.ReactNode;
+  openOverride?: boolean;
+  onToggle?: () => void;
 }
 
-export default function GuideAccordion({ sectionKey, title, emoji, children }: Props) {
+export default function GuideAccordion({ sectionKey, title, emoji, children, openOverride, onToggle }: Props) {
   const [openSections, setOpenSections] = useAtom(guideOpenSectionsAtom);
-  const open = !!openSections[sectionKey];
+  const open = openOverride !== undefined ? openOverride : !!openSections[sectionKey];
 
-  const toggle = () =>
-    setOpenSections((prev) => ({ ...prev, [sectionKey]: !prev[sectionKey] }));
+  const toggle = onToggle ?? (() =>
+    setOpenSections((prev) => ({ ...prev, [sectionKey]: !prev[sectionKey] })));
 
   return (
     <Card
