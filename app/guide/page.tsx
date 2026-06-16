@@ -94,34 +94,14 @@ export default function GuidePage() {
 
         {/* 긴급 연락처 */}
         <GuideAccordion sectionKey="emergency" title={emergencyData.title} emoji={emergencyData.emoji}>
-          {/* 대사관 */}
+          {/* 비상연락망 안내 */}
           <div className="mb-4">
-            <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1.5">
-              <span>{emergencyData.embassy.emoji}</span>
-              {emergencyData.embassy.name}
-            </h4>
-            <div className="flex flex-col gap-2">
-              {emergencyData.embassy.contacts.map((c) => (
-                <a
-                  key={c.number}
-                  href={`tel:${c.number}`}
-                  className={`flex items-center justify-between rounded-xl px-4 py-3 ${
-                    c.highlight ? "bg-red-50 border border-red-200" : "bg-white/60"
-                  }`}
-                >
-                  <span className={`text-sm ${c.highlight ? "text-red-600 font-medium" : "text-gray-700"}`}>
-                    {c.label}
-                  </span>
-                  <PhoneIcon
-                    width={16}
-                    height={16}
-                    className={c.highlight ? "text-red-500" : "text-gray-400"}
-                    style={c.highlight ? undefined : { color: brandDark }}
-                  />
-                </a>
-              ))}
+            <div className="bg-white/60 rounded-xl px-4 py-3 flex items-center gap-3">
+              <span className="text-xl">📋</span>
+              <p className="text-sm text-gray-700 leading-relaxed">
+                비상연락망은 <span className="font-semibold" style={{ color: brandDark }}>각 개인적으로 배부</span>됩니다.
+              </p>
             </div>
-            <p className="text-xs text-gray-400 mt-2">⏰ {emergencyData.embassy.hours}</p>
           </div>
 
           {/* 현지 긴급 */}
