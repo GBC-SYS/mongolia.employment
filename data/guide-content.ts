@@ -135,6 +135,23 @@ export const safetyData = {
   ],
 };
 
+export const accommodationData = {
+  title: "숙소 정보",
+  emoji: "🏨",
+  hotels: [
+    {
+      name: "월드 몽골리아 호텔",
+      address: "WX8F+CVC Офицеруудын ордон, BZD - 16 khoroo, Ulaanbaatar 13321 몽골",
+      phone: "+97677166161",
+    },
+    {
+      name: "Glory Resort Mongolia, Terelj",
+      address: "Terelj, Nalaikh, Ulaanbaatar, 몽골",
+      phone: "+97670702222",
+    },
+  ],
+};
+
 export const emergencyData = {
   title: "긴급 연락처",
   emoji: "🚨",

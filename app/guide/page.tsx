@@ -1,8 +1,8 @@
 import GuideAccordion from "@/components/GuideAccordion";
 import Checklist from "@/components/Checklist";
 import ClientOnly from "@/components/ClientOnly";
-import { weatherData, safetyData, emergencyData } from "@/data/guide-content";
-import { PhoneIcon, ExclamationTriangleIcon } from "@heroicons/react/24/outline";
+import { weatherData, safetyData, emergencyData, accommodationData } from "@/data/guide-content";
+import { PhoneIcon, ExclamationTriangleIcon, BuildingOffice2Icon } from "@heroicons/react/24/outline";
 
 export const dynamic = "force-dynamic";
 
@@ -46,6 +46,28 @@ export default function GuidePage() {
         {/* 준비물 체크리스트 */}
         <GuideAccordion sectionKey="checklist" title="준비물 체크리스트" emoji="📋">
           <Checklist />
+        </GuideAccordion>
+
+        {/* 숙소 정보 */}
+        <GuideAccordion sectionKey="accommodation" title={accommodationData.title} emoji={accommodationData.emoji}>
+          <div className="flex flex-col gap-3">
+            {accommodationData.hotels.map((hotel, i) => (
+              <div key={i} className="bg-white/60 rounded-xl p-4 flex flex-col gap-2">
+                <div className="flex items-center gap-2">
+                  <BuildingOffice2Icon width={16} height={16} style={{ color: brandDark }} />
+                  <p className="text-sm font-semibold text-gray-900">{hotel.name}</p>
+                </div>
+                <p className="text-xs text-gray-500 leading-relaxed pl-6">{hotel.address}</p>
+                <a
+                  href={`tel:${hotel.phone}`}
+                  className="flex items-center gap-2 pl-6"
+                >
+                  <PhoneIcon width={14} height={14} style={{ color: brandDark }} />
+                  <span className="text-sm font-medium" style={{ color: brandDark }}>{hotel.phone}</span>
+                </a>
+              </div>
+            ))}
+          </div>
         </GuideAccordion>
 
         {/* 안전수칙 */}
