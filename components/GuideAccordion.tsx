@@ -41,6 +41,7 @@ export default function GuideAccordion({ sectionKey, title, emoji, children }: P
         <ChevronDownIcon
           width={18}
           height={18}
+          strokeWidth={2.5}
           className={cn(
             "text-gray-900 transition-transform duration-200",
             open && "rotate-180"
