@@ -11,6 +11,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ---
 
+## ⚠️ 커밋 워크플로우 규칙
+
+코드 변경 후 커밋 전에 **반드시 아래 순서를 따를 것.**
+
+1. `code-reviewer` 에이전트 실행 → 이슈 확인 및 수정
+2. 수정 완료 후 `git-workflow-manager` 에이전트로 커밋 & 푸시
+
+> code-reviewer 없이 커밋하면 안 됨. 리뷰 결과를 받은 후 지적 사항을 실제 파일에 반영한 뒤 커밋할 것.
+
+---
+
 ## 명령어
 
 ```bash
