@@ -3,9 +3,10 @@
 export const dynamic = "force-dynamic";
 
 import { useAtom } from "jotai";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { SpeakerWaveIcon } from "@heroicons/react/24/outline";
 import GuideAccordion from "@/components/GuideAccordion";
+import ClientOnly from "@/components/ClientOnly";
 import { phrasebookData } from "@/data/phrasebook";
 import { phrasebookOpenSectionsAtom } from "@/store/atoms";
 
@@ -24,6 +25,15 @@ function PhrasebookContent() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // 언마운트 시 재생 중인 오디오·interval 정리
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
+      if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
+      if (typeof window !== "undefined") window.speechSynthesis?.cancel();
+    };
+  }, []);
+
   const stopAll = () => {
     if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
     audioRef.current?.pause();
@@ -34,21 +44,28 @@ function PhrasebookContent() {
   };
 
   const playAudio = (src: string, pron: string, key: string) => {
-    stopAll();
-    if (playingKey === key) return;
     const audio = new Audio(src);
     audioRef.current = audio;
     const pronWords = pron.trim().split(/\s+/);
     setPlayingKey(key);
     setPlayingWordIdx(0);
-    // 오디오 길이 확정 후 단어별 구간 계산
-    audio.addEventListener("loadedmetadata", () => {
+
+    const startInterval = () => {
+      if (intervalRef.current) return;
       const wordDuration = audio.duration / pronWords.length;
       intervalRef.current = setInterval(() => {
         const idx = Math.min(Math.floor(audio.currentTime / wordDuration), pronWords.length - 1);
         setPlayingWordIdx(idx);
       }, 80);
-    });
+    };
+
+    // 캐시된 파일은 loadedmetadata가 이미 완료된 상태일 수 있음
+    if (audio.readyState >= 1) {
+      startInterval();
+    } else {
+      audio.addEventListener("loadedmetadata", startInterval);
+    }
+
     audio.onended = () => {
       if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
       setPlayingKey(null);
@@ -59,8 +76,6 @@ function PhrasebookContent() {
 
   const speakMongolian = (mn: string, pron: string, key: string) => {
     if (typeof window === "undefined" || !window.speechSynthesis) return;
-    stopAll();
-    if (playingKey === key) return;
     const utterance = new SpeechSynthesisUtterance(mn);
     utterance.lang = "mn-MN";
     utterance.rate = 0.82;
@@ -83,6 +98,11 @@ function PhrasebookContent() {
   };
 
   const handleAudio = (phrase: { mn: string; pron: string; audio?: string }, key: string) => {
+    // stopAll 전에 현재 재생 중인지 캡처 → 토글 정지 버그 방지
+    const wasPlaying = playingKey === key;
+    stopAll();
+    if (wasPlaying) return;
+
     if (phrase.audio) {
       playAudio(phrase.audio, phrase.pron, key);
     } else {
@@ -91,105 +111,101 @@ function PhrasebookContent() {
   };
 
   return (
-    <>
-      <div className="flex flex-col gap-3 px-4 py-4">
-        {phrasebookData.map((section) => {
-          const open = !!openSections[section.key];
-          const toggle = () =>
-            setOpenSections((prev) => ({ ...prev, [section.key]: !prev[section.key] }));
+    <div className="flex flex-col gap-3 px-4 py-4">
+      {phrasebookData.map((section) => {
+        const open = !!openSections[section.key];
+        const toggle = () =>
+          setOpenSections((prev) => ({ ...prev, [section.key]: !prev[section.key] }));
 
-          return (
-            <GuideAccordion
-              key={section.key}
-              sectionKey={section.key}
-              title={section.title}
-              emoji={section.emoji}
-              openOverride={open}
-              onToggle={toggle}
-            >
-              <div className="flex flex-col gap-2">
-                {section.phrases.map((phrase, i) => {
-                  const audioKey = `${section.key}_${i}`;
-                  const isPlaying = playingKey === audioKey;
-                  return (
-                    <div
-                      key={i}
-                      className="rounded-xl px-4 py-3"
-                      style={{ background: "rgba(255,255,255,0.65)" }}
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            {section.numbered && (
-                              <span
-                                className="flex-shrink-0 w-5 h-5 text-xs font-bold rounded-full flex items-center justify-center border"
-                                style={{
-                                  background: "rgba(22,101,52,0.1)",
-                                  color: brandDark,
-                                  borderColor: "rgba(22,101,52,0.3)",
-                                }}
-                              >
-                                {i + 1}
-                              </span>
-                            )}
-                            <p className="text-xs text-gray-500 leading-relaxed">{phrase.ko}</p>
-                          </div>
-                          <p className="text-sm font-semibold text-gray-900 leading-snug mb-1">
-                            {phrase.mn}
-                          </p>
-                          <p className="text-xs leading-relaxed">
-                            {isPlaying
-                              ? phrase.pron.trim().split(/\s+/).map((word, wi) => (
-                                  <span
-                                    key={wi}
-                                    className="transition-all duration-150"
-                                    style={
-                                      wi === playingWordIdx
-                                        ? {
-                                            background: "linear-gradient(120deg, #bbf7d0 0%, #86efac 100%)",
-                                            color: "#14532d",
-                                            fontWeight: 700,
-                                            borderRadius: "3px",
-                                            padding: "1px 3px",
-                                          }
-                                        : { color: "#9ca3af" }
-                                    }
-                                  >
-                                    {word}{" "}
-                                  </span>
-                                ))
-                              : <span style={{ color: "#9ca3af" }}>{phrase.pron}</span>
-                            }
-                          </p>
+        return (
+          <GuideAccordion
+            key={section.key}
+            sectionKey={section.key}
+            title={section.title}
+            emoji={section.emoji}
+            openOverride={open}
+            onToggle={toggle}
+          >
+            <div className="flex flex-col gap-2">
+              {section.phrases.map((phrase, i) => {
+                const audioKey = `${section.key}_${i}`;
+                const isPlaying = playingKey === audioKey;
+                return (
+                  <div
+                    key={i}
+                    className="rounded-xl px-4 py-3"
+                    style={{ background: "rgba(255,255,255,0.65)" }}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          {section.numbered && (
+                            <span
+                              className="flex-shrink-0 w-5 h-5 text-xs font-bold rounded-full flex items-center justify-center border"
+                              style={{
+                                background: "rgba(22,101,52,0.1)",
+                                color: brandDark,
+                                borderColor: "rgba(22,101,52,0.3)",
+                              }}
+                            >
+                              {i + 1}
+                            </span>
+                          )}
+                          <p className="text-xs text-gray-500 leading-relaxed">{phrase.ko}</p>
                         </div>
-                        {(phrase.audio || section.key === "gospel" || section.key === "blessing") && (
-                          <button
-                            onClick={() => handleAudio(phrase, audioKey)}
-                            className="flex-shrink-0 p-2 rounded-lg active:scale-90 transition-all"
-                            style={{
-                              background: isPlaying
-                                ? "rgba(22,101,52,0.85)"
-                                : "rgba(22,101,52,0.1)",
-                            }}
-                            aria-label="발음 듣기"
-                          >
-                            <SpeakerWaveIcon
-                              width={16}
-                              height={16}
-                              style={{ color: isPlaying ? "#fff" : brandDark }}
-                            />
-                          </button>
-                        )}
+                        <p className="text-sm font-semibold text-gray-900 leading-snug mb-1">
+                          {phrase.mn}
+                        </p>
+                        <p className="text-xs leading-relaxed">
+                          {isPlaying
+                            ? phrase.pron.trim().split(/\s+/).map((word, wi) => (
+                                <span
+                                  key={wi}
+                                  className="transition-all duration-150"
+                                  style={
+                                    wi === playingWordIdx
+                                      ? {
+                                          background: "linear-gradient(120deg, #bbf7d0 0%, #86efac 100%)",
+                                          color: "#14532d",
+                                          fontWeight: 700,
+                                          borderRadius: "3px",
+                                          padding: "1px 3px",
+                                        }
+                                      : { color: "#9ca3af" }
+                                  }
+                                >
+                                  {word}{" "}
+                                </span>
+                              ))
+                            : <span style={{ color: "#9ca3af" }}>{phrase.pron}</span>
+                          }
+                        </p>
                       </div>
+                      {phrase.audio && (
+                        <button
+                          onClick={() => handleAudio(phrase, audioKey)}
+                          className="flex-shrink-0 p-2 rounded-lg active:scale-90 transition-all"
+                          style={{
+                            background: isPlaying ? "rgba(22,101,52,0.85)" : "rgba(22,101,52,0.1)",
+                          }}
+                          aria-label="발음 듣기"
+                        >
+                          <SpeakerWaveIcon
+                            width={16}
+                            height={16}
+                            style={{ color: isPlaying ? "#fff" : brandDark }}
+                          />
+                        </button>
+                      )}
                     </div>
-                  );
-                })}
-              </div>
-            </GuideAccordion>
-          );
-        })}
-      </div>
-    </>
+                  </div>
+                );
+              })}
+            </div>
+          </GuideAccordion>
+        );
+      })}
+    </div>
   );
 }
 
@@ -206,7 +222,9 @@ export default function PhrasebookPage() {
         </p>
       </div>
 
-      <PhrasebookContent />
+      <ClientOnly>
+        <PhrasebookContent />
+      </ClientOnly>
     </div>
   );
 }
