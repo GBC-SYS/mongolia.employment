@@ -162,7 +162,7 @@ function PhrasebookContent() {
                             }
                           </p>
                         </div>
-                        {(phrase.audio || section.key === "gospel") && (
+                        {(phrase.audio || section.key === "gospel" || section.key === "blessing") && (
                           <button
                             onClick={() => handleAudio(phrase, audioKey)}
                             className="flex-shrink-0 p-2 rounded-lg active:scale-90 transition-all"
