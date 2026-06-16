@@ -26,6 +26,8 @@
 | 중기 | **Upstash Redis** 도입 | 기도 하트(카운트) + 기도응답 저장 — 서버리스 환경에 적합 |
 | 중기 | **Pretendard** 고정 웨이트 9종 전체 적용 | next/font/local, public/fonts 경로, 한국어 줄바꿈 개선 |
 | 2026-06-16 | `GuideAccordion`에 `openOverride`/`onToggle` props 추가 | 구문집 전용 atom을 별도로 두면서도 기존 컴포넌트 재사용 필요 |
+| 2026-06-16 | 구문집 오디오 — MP3 우선, TTS 폴백 구조 | MP3 존재 시 `playAudio()`, 없으면 `speakMongolian()` — 단일 `handleAudio()`로 분기 |
+| 2026-06-16 | 가라오케 하이라이팅 — 타임스탬프 없이 균등 분할 | 오디오 duration ÷ 단어 수로 단어당 구간 추정, `setInterval 80ms`로 `currentTime` 폴링 |
 
 ---
 
@@ -75,11 +77,24 @@
 ### 전도 구문집 (`/phrasebook`) — 2026-06-16 추가 (커밋 fe1e79d)
 - [x] 4개 섹션: 기본 인사 & 자기소개 / 축복 & 사랑의 표현 / 복음 핵심 메시지 / 일상 표현
 - [x] 복음 핵심 메시지 섹션 — 번호 있는 10단계 전도 시퀀스
-- [x] 구문 카드 "크게보기" 버튼 → 몽골어 전체화면 오버레이 (`PhraseEnlargeModal`)
-- [x] Jotai atoms 추가: `phrasebookOpenSectionsAtom`, `enlargedPhraseAtom` (`store/atoms.ts`)
+- [x] Jotai atoms 추가: `phrasebookOpenSectionsAtom` (`store/atoms.ts`)
 - [x] `GuideAccordion`에 `openOverride`/`onToggle` 선택적 props 추가 (별도 atom 재사용 가능)
 - [x] 외부 API 없는 순수 정적 구문집 — 오프라인 동작
 - [x] iOS safe-area, Android Chrome `backdrop-filter` 크로스브라우징 규칙 준수
+
+### 전도 구문집 오디오 기능
+
+> 2026-06-16 추가 — MP3 파일 네이밍 규칙: `{섹션키}_{인덱스}.mp3` (예: `gospel_0.mp3`)
+
+- [x] MP3 오디오 재생 — 복음 핵심 메시지 10문장 (`gospel_0.mp3` ~ `gospel_9.mp3`)
+- [x] MP3 오디오 재생 — 축복 & 사랑의 표현 6문장 (`blessing_0.mp3` ~ `blessing_5.mp3`)
+- [x] Web Speech API TTS — MP3 없는 구문(기본 인사·일상 표현) 대상 `mn-MN` 음성 합성
+- [x] 가라오케 하이라이팅 — MP3 재생 중 발음 텍스트 단어별 형광 강조 (`setInterval` 80ms)
+- [x] TTS 가라오케 — `onboundary` 이벤트 기반 단어별 실시간 강조
+- [x] 재생 토글 버그 수정 — `wasPlaying` 캡처로 stale closure 해결
+- [x] 캐시 오디오 대응 — `readyState >= 1` 확인 후 `loadedmetadata` 이벤트 조건부 등록
+- [x] 언마운트 cleanup — interval + Audio + speechSynthesis 메모리 누수 방지
+- [x] `public/audio/phrasebook/` 디렉터리 — MP3 파일 보관 위치
 
 ---
 
@@ -111,6 +126,13 @@
 - [ ] 기도응답 데이터 백업 (Redis → JSON export)
 - [ ] 사역 결과 페이지 추가 검토
 - [ ] 레포 archive 처리 또는 다음 선교 시즌을 위한 템플릿화
+
+---
+
+## 개발 워크플로우 규칙
+
+프로젝트 루트 `CLAUDE.md`의 **"커밋 워크플로우 규칙"** 섹션 참조.  
+요약: `code-reviewer` 에이전트 실행 → 수정 → `git-workflow-manager`로 커밋 & 푸시.
 
 ---
 
