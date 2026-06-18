@@ -59,18 +59,6 @@ export const phrasebookData: PhrasebookSection[] = [
     ],
   },
   {
-    key: "vocab",
-    title: "핵심 단어",
-    emoji: "📖",
-    phrases: [
-      { ko: "하나님 / 신", mn: "Бурхан", pron: "부르항", audio: "/audio/phrasebook/vocab_god.mp3" },
-      { ko: "천국", mn: "Диваажин", pron: "디와진", audio: "/audio/phrasebook/vocab_heaven.mp3" },
-      { ko: "죄", mn: "Нүгэл", pron: "누글 / 누구이쓰", audio: "/audio/phrasebook/vocab_sin.mp3" },
-      { ko: "십자가", mn: "Загалмай", pron: "자갈마이 / 자가마이", audio: "/audio/phrasebook/vocab_cross.mp3" },
-      { ko: "구원자", mn: "Аврагч", pron: "아우락치 / 아우러브치", audio: "/audio/phrasebook/vocab_savior.mp3" },
-    ],
-  },
-  {
     key: "gospel",
     title: "복음 핵심 메시지",
     emoji: "✝️",
@@ -136,6 +124,18 @@ export const phrasebookData: PhrasebookSection[] = [
         pron: "예수싱 네레-르 잘비를라. 아멘",
         audio: "/audio/phrasebook/gospel_9.mp3",
       },
+    ],
+  },
+  {
+    key: "vocab",
+    title: "핵심 단어",
+    emoji: "📖",
+    phrases: [
+      { ko: "하나님 / 신", mn: "Бурхан", pron: "부르항", audio: "/audio/phrasebook/vocab_god.mp3" },
+      { ko: "천국", mn: "Диваажин", pron: "디와진", audio: "/audio/phrasebook/vocab_heaven.mp3" },
+      { ko: "죄", mn: "Нүгэл", pron: "누글 / 누구이쓰", audio: "/audio/phrasebook/vocab_sin.mp3" },
+      { ko: "십자가", mn: "Загалмай", pron: "자갈마이 / 자가마이", audio: "/audio/phrasebook/vocab_cross.mp3" },
+      { ko: "구원자", mn: "Аврагч", pron: "아우락치 / 아우러브치", audio: "/audio/phrasebook/vocab_savior.mp3" },
     ],
   },
   {

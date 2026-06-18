@@ -16,8 +16,8 @@ export const phrasebookOpenSectionsAtom = atom<Record<string, boolean>>({
   greeting: true,
   blessing: true,
   confession: false,
-  vocab: false,
   gospel: false,
+  vocab: false,
   daily: false,
 });
 
