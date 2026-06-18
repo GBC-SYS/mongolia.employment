@@ -40,8 +40,34 @@ export const phrasebookData: PhrasebookSection[] = [
       { ko: "하나님의 축복이 있기를 바랍니다", mn: "Бурхан таныг ивээх болтугай.", pron: "부르항 타닉 이웨-흐 볼토개", audio: "/audio/phrasebook/blessing_1.mp3" },
       { ko: "당신을 위해 기도하겠습니다", mn: "Би таны төлөө залбиръя.", pron: "비 타니 털러 잘비리야", audio: "/audio/phrasebook/blessing_2.mp3" },
       { ko: "예수님은 당신의 친구입니다", mn: "Есүс бол таны найз.", pron: "예수쓰 볼 타니 내즈", audio: "/audio/phrasebook/blessing_3.mp3" },
-      { ko: "당신은 소중한 사람입니다", mn: "Та бол эрхэм нандин хүн.", pron: "타 볼 에르헴 난딩 훙", audio: "/audio/phrasebook/blessing_4.mp3" },
       { ko: "만나서 정말 기쁩니다", mn: "Уулзсандаа маш их баяртай байна.", pron: "오올쯔싼다 마시 이흐 바야르태 배나", audio: "/audio/phrasebook/blessing_5.mp3" },
+    ],
+  },
+  {
+    key: "confession",
+    title: "신앙 고백 & 전도용 문장",
+    emoji: "🙏",
+    phrases: [
+      { ko: "예수님 믿으세요", mn: "Есүст итгээрэй.", pron: "예수쓰트 이트게레", audio: "/audio/phrasebook/confession_0.m4a" },
+      { ko: "하나님은 살아계십니다", mn: "Бурхан амьд.", pron: "부르항 에미드", audio: "/audio/phrasebook/confession_1.m4a" },
+      { ko: "예수님 안에서 우리는 하나입니다", mn: "Бид Есүс дотор нэг гэр бүл.", pron: "비드 예수쓰 도토르 넥 게르 불", audio: "/audio/phrasebook/confession_2.m4a" },
+      { ko: "당신은 소중한 사람입니다", mn: "Та бол эрхэм нандин хүн.", pron: "타 볼 에르헴 난딩 훙", audio: "/audio/phrasebook/blessing_4.mp3" },
+      { ko: "예수님은 당신의 구원자입니다", mn: "Есүс бол таны Аврагч юм.", pron: "예수스 볼 타니 아우락치 윰", audio: "/audio/phrasebook/confession_4.mp3" },
+      { ko: "눈을 감으세요 (기도할 때)", mn: "Нүдээ аниарай.", pron: "뉘데 아니아래", audio: "/audio/phrasebook/confession_5.mp3" },
+      { ko: "손을 모으고 기도하세요", mn: "Гартаа залбираара.", pron: "알가- 하우스라-래", audio: "/audio/phrasebook/confession_6.mp3" },
+      { ko: "힘내! (파이팅!)", mn: "Амжилт! / Зүтгээд байгаарай!", pron: "쥬트힡 배가래! / 암질트!", audio: "/audio/phrasebook/confession_7.mp3" },
+    ],
+  },
+  {
+    key: "vocab",
+    title: "핵심 단어",
+    emoji: "📖",
+    phrases: [
+      { ko: "하나님 / 신", mn: "Бурхан", pron: "부르항", audio: "/audio/phrasebook/vocab_god.mp3" },
+      { ko: "천국", mn: "Диваажин", pron: "디와진", audio: "/audio/phrasebook/vocab_heaven.mp3" },
+      { ko: "죄", mn: "Нүгэл", pron: "누글 / 누구이쓰", audio: "/audio/phrasebook/vocab_sin.mp3" },
+      { ko: "십자가", mn: "Загалмай", pron: "자갈마이 / 자가마이", audio: "/audio/phrasebook/vocab_cross.mp3" },
+      { ko: "구원자", mn: "Аврагч", pron: "아우락치 / 아우러브치", audio: "/audio/phrasebook/vocab_savior.mp3" },
     ],
   },
   {
@@ -71,7 +97,7 @@ export const phrasebookData: PhrasebookSection[] = [
       {
         ko: "죄인은 천국에 가는 것이 불가능합니다.",
         mn: "Нүгэлт хүн диваажинд очих боломжгүй.",
-        pron: "누글트 훙 디와진드 오치흐 볼름지구이",
+        pron: "누구을텡 디와-진드 오칙 보롬쥬이",
         audio: "/audio/phrasebook/gospel_3.mp3",
       },
       {
@@ -125,7 +151,6 @@ export const phrasebookData: PhrasebookSection[] = [
       { ko: "천천히 말씀해 주세요", mn: "Удаан яриач.", pron: "오당 야리아츠" },
       { ko: "다시 한번 말씀해 주세요", mn: "Дахиад хэлээч.", pron: "다햐드 헬레-츠" },
       { ko: "잠시만요", mn: "Түр хүлээнэ үү.", pron: "튀르 훌레-네 오" },
-      { ko: "힘내! (파이팅!)", mn: "Амжилт!", pron: "암질트!" },
     ],
   },
 ];

@@ -15,7 +15,9 @@ export const checklistAtom = atom<Record<string, boolean>>({});
 export const phrasebookOpenSectionsAtom = atom<Record<string, boolean>>({
   greeting: true,
   blessing: true,
-  gospel: true,
+  confession: false,
+  vocab: false,
+  gospel: false,
   daily: false,
 });
 
