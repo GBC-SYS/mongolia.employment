@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { EnvelopeIcon, BookOpenIcon, CalendarIcon, MusicalNoteIcon, HeartIcon, ChatBubbleLeftRightIcon } from "@heroicons/react/24/outline";
+import { EnvelopeIcon, BookOpenIcon, CalendarIcon, MusicalNoteIcon, HeartIcon, ChatBubbleLeftRightIcon, BookmarkIcon } from "@heroicons/react/24/outline";
 import Countdown from "@/components/Countdown";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -92,6 +92,20 @@ export default function HomePage() {
             </div>
           </Link>
         </div>
+
+        {/* 매일 QT 진입 카드 */}
+        <Link
+          href="/qt"
+          className="rounded-2xl p-5 flex items-center gap-4 active:scale-95 transition-transform"
+          style={cardGlass}
+        >
+          <BookmarkIcon width={28} height={28} strokeWidth={1.5} style={{ color: brand }} />
+          <div className="flex-1">
+            <p className="font-semibold text-gray-900">매일 QT</p>
+            <p className="text-gray-500 text-xs mt-0.5">베드로전서 7일 묵상</p>
+          </div>
+          <span className="text-xs font-medium px-2.5 py-1 rounded-full" style={{ background: "rgba(22,101,52,0.10)", color: brandDark }}>매일</span>
+        </Link>
 
         {/* 전도 구문집 진입 카드 */}
         <Link

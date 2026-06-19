@@ -22,3 +22,6 @@ export const phrasebookOpenSectionsAtom = atom<Record<string, boolean>>({
 });
 
 export const enlargedPhraseAtom = atom<{ mn: string; pron: string } | null>(null);
+
+export const qtSelectedDayAtom = atom<number>(1);
+export const qtVerseOpenAtom = atom<boolean>(false);
