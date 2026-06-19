@@ -179,16 +179,28 @@ function DebriefingForm({ day }: { day: number }) {
                 </span>
               </div>
               {entry.grace && (
-                <p className="text-xs text-gray-800 mb-1">
-                  <span className="font-semibold text-gray-600">은혜 </span>
-                  {entry.grace}
-                </p>
+                <div className="mb-1.5 flex items-start gap-1.5" role="note" aria-label={`은혜: ${entry.grace}`}>
+                  <span
+                    className="flex-shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded-md mt-0.5"
+                    aria-hidden="true"
+                    style={{ background: "rgba(22,163,74,0.12)", color: "#15803d" }}
+                  >
+                    은혜
+                  </span>
+                  <span className="text-xs text-gray-800 leading-5">{entry.grace}</span>
+                </div>
               )}
               {entry.improvement && (
-                <p className="text-xs text-gray-800">
-                  <span className="font-semibold text-gray-600">개선 </span>
-                  {entry.improvement}
-                </p>
+                <div className="flex items-start gap-1.5" role="note" aria-label={`개선: ${entry.improvement}`}>
+                  <span
+                    className="flex-shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded-md mt-0.5"
+                    aria-hidden="true"
+                    style={{ background: "rgba(245,158,11,0.12)", color: "#b45309" }}
+                  >
+                    개선
+                  </span>
+                  <span className="text-xs text-gray-800 leading-5">{entry.improvement}</span>
+                </div>
               )}
             </div>
           ))}
