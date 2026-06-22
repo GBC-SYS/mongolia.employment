@@ -101,6 +101,37 @@ public/
 
 ---
 
+## 라우팅 & 렌더링 전략
+
+### 결정 규칙
+
+새 페이지 작성 시 아래 규칙으로 렌더링 전략을 결정할 것.
+
+| 조건 | 전략 | 필수 선언 |
+|------|------|----------|
+| Jotai `useAtom` 사용 | Dynamic | `export const dynamic = "force-dynamic"` |
+| `"use client"` + 로컬 state만 사용 | Client Component | 선언 불필요 (Next.js 자동 처리) |
+| 서버 데이터 + `generateStaticParams` | Static SSG | `generateStaticParams()` export |
+| 순수 정적 데이터만 표시 | Static | 선언 불필요 |
+
+### 라우트 인벤토리
+
+| 경로 | 파일 | 렌더링 | 비고 |
+|------|------|--------|------|
+| `/` | `app/page.tsx` | Static | 카운트다운, 빠른 진입 카드 |
+| `/prayer-letters` | `app/prayer-letters/page.tsx` | Dynamic | Jotai `selectedLetterAtom` |
+| `/prayer-letters/[id]` | `app/prayer-letters/[id]/page.tsx` | Static SSG | `generateStaticParams` |
+| `/guide` | `app/guide/page.tsx` | Dynamic | Jotai `guideOpenSectionsAtom`, `checklistAtom` |
+| `/qt` | `app/qt/page.tsx` | Dynamic | Jotai 사용 |
+| `/group-prayer` | `app/group-prayer/page.tsx` | Dynamic | Jotai 사용 |
+| `/phrasebook` | `app/phrasebook/page.tsx` | Dynamic | Jotai 사용 |
+| `/cuesheet` | `app/cuesheet/page.tsx` | Client | `"use client"` + `useState` |
+| `/song` | `app/song/page.tsx` | Client | `"use client"` + `useRouter` |
+
+> 새 라우트 추가 시 이 표를 반드시 업데이트할 것.
+
+---
+
 ## 상태 관리 (Jotai)
 
 > **Recoil은 React 19와 호환 불가** (`__SECRET_INTERNALS` API 제거됨). Jotai로 대체.  
