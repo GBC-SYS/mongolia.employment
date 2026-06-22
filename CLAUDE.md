@@ -33,6 +33,23 @@ yarn remove <package>  # 패키지 제거
 
 ---
 
+## 복잡한 문제 해결 — Chain of Thought
+
+복잡한 문제(버그 디버깅, 아키텍처 결정, 다단계 기능 구현 등)를 만나면
+**사고 연쇄(Chain of Thought) 방식으로 접근**할 것.
+
+결론을 바로 내리지 말고, 아래 순서로 단계별로 끊어서 논리적으로 사고한다.
+
+1. **문제 정의** — 무엇이 문제인가? 기대 동작과 실제 동작의 차이는?
+2. **원인 분석** — 가능한 원인을 모두 나열한다
+3. **가설 검증** — 각 원인을 코드/데이터로 확인한다
+4. **해결책 도출** — 검증된 원인 기반으로 해결책을 선택한다
+5. **부작용 검토** — 변경이 다른 부분에 미치는 영향을 확인한다
+
+> 참고: [Measuring Faithfulness in Chain-of-Thought Reasoning](https://www.anthropic.com/research/measuring-faithfulness-in-chain-of-thought-reasoning) — Anthropic Research
+
+---
+
 ## 명령어
 
 ```bash
