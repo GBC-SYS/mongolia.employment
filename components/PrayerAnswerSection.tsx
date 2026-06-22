@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { type PrayerAnswer } from "@/lib/redis";
+import { type PrayerAnswer } from "@/lib/db";
 
 export default function PrayerAnswerSection({ letterId }: { letterId: string }) {
   const [answers, setAnswers] = useState<PrayerAnswer[]>([]);

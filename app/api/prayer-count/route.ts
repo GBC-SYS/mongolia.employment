@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { redis, PRAYER_COUNT_KEY, getPrayerCount } from "@/lib/redis";
+import { getPrayerCount, incrementPrayerCount } from "@/lib/db";
 
 export async function GET() {
   const count = await getPrayerCount();
@@ -7,6 +7,6 @@ export async function GET() {
 }
 
 export async function POST() {
-  const count = await redis.incr(PRAYER_COUNT_KEY);
+  const count = await incrementPrayerCount();
   return NextResponse.json({ count });
 }

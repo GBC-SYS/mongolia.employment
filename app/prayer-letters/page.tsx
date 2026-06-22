@@ -1,7 +1,7 @@
 import { prayerLetters } from "@/data/prayer-letters";
 import ImageViewer from "@/components/ImageViewer";
 import PrayerHeartButton from "@/components/PrayerHeartButton";
-import { getPrayerCount } from "@/lib/redis";
+import { getPrayerCount } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 

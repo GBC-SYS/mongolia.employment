@@ -41,7 +41,7 @@ export default function QtDayTabs() {
           <button
             key={day}
             onClick={() => handleSelect(day)}
-            className="flex-shrink-0 flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl text-sm font-medium transition-all"
+            className="flex-shrink-0 flex flex-col items-center gap-0.5 px-6 py-2 rounded-xl text-sm font-medium transition-all"
             style={
               isSelected
                 ? { background: "#16A34A", color: "#fff" }

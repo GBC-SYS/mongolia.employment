@@ -22,12 +22,23 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ---
 
+## ⚠️ 패키지 매니저
+
+이 프로젝트는 **yarn**을 사용합니다. `npm` 대신 반드시 `yarn`을 사용할 것.
+
+```bash
+yarn add <package>     # 패키지 설치
+yarn remove <package>  # 패키지 제거
+```
+
+---
+
 ## 명령어
 
 ```bash
-npm run dev      # 개발 서버 (http://localhost:3000)
-npm run build    # 프로덕션 빌드
-npm run lint     # ESLint 실행
+yarn dev      # 개발 서버 (http://localhost:3000)
+yarn build    # 프로덕션 빌드
+yarn lint     # ESLint 실행
 ```
 
 ---

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getQtDebriefings, addQtDebriefing } from "@/lib/redis";
+import { getQtDebriefings, addQtDebriefing } from "@/lib/db";
 
 export async function GET(request: NextRequest) {
   const day = Number(request.nextUrl.searchParams.get("day"));

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getPrayerAnswers, addPrayerAnswer } from "@/lib/redis";
+import { getPrayerAnswers, addPrayerAnswer } from "@/lib/db";
 
 export async function GET(
   _req: NextRequest,

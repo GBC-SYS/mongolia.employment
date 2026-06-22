@@ -4,7 +4,8 @@ export const dynamic = "force-dynamic";
 
 import { useAtom } from "jotai";
 import { useRef, useState, useEffect } from "react";
-import { SpeakerWaveIcon } from "@heroicons/react/24/outline";
+import { useRouter } from "next/navigation";
+import { SpeakerWaveIcon, ChevronLeftIcon } from "@heroicons/react/24/outline";
 import GuideAccordion from "@/components/GuideAccordion";
 import ClientOnly from "@/components/ClientOnly";
 import { phrasebookData } from "@/data/phrasebook";
@@ -210,16 +211,38 @@ function PhrasebookContent() {
 }
 
 export default function PhrasebookPage() {
+  const router = useRouter();
+
+  const handleBack = () => {
+    const isSameOrigin =
+      document.referrer && new URL(document.referrer).origin === window.location.origin;
+    if (isSameOrigin) {
+      router.back();
+    } else {
+      router.replace("/");
+    }
+  };
+
   return (
     <div className="min-h-screen pb-20 lg:pb-0" style={glass}>
       <div
         className="px-5 pt-14 pb-6"
         style={{ borderBottom: "1px solid rgba(255, 255, 255, 0.95)" }}
       >
-        <h1 className="text-2xl font-bold text-gray-900">전도 구문집</h1>
-        <p className="text-sm mt-1 font-medium" style={{ color: brandDark }}>
-          한·몽 표현 모음
-        </p>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleBack}
+            className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full active:scale-90 transition-transform"
+            style={{ background: "rgba(243, 244, 246, 0.9)" }}
+            aria-label="뒤로가기"
+          >
+            <ChevronLeftIcon width={16} height={16} style={{ color: "#374151" }} />
+          </button>
+          <div>
+            <p className="text-xs font-medium" style={{ color: brandDark }}>몽골 선교팀</p>
+            <h1 className="text-2xl font-bold text-gray-900">전도 구문집</h1>
+          </div>
+        </div>
       </div>
 
       <ClientOnly>

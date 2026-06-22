@@ -4,7 +4,7 @@ import { useAtom } from "jotai";
 import { qtSelectedDayAtom, qtVerseOpenAtom } from "@/store/atoms";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { qtDays } from "@/data/qt-content";
-import type { QtDebriefing } from "@/lib/redis";
+import type { QtDebriefing } from "@/lib/db";
 import { useState, useEffect, useCallback } from "react";
 
 function VerseBlock({ verses, passage }: { verses: string; passage: string }) {
@@ -169,7 +169,12 @@ function DebriefingForm({ day }: { day: number }) {
               }}
             >
               <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs font-semibold text-green-700">{entry.author}</span>
+                <span className="text-xs font-semibold text-green-700">
+                  {entry.author}
+                  {entry.author === "홍길동" && (
+                    <span className="ml-1 font-normal text-gray-400">(샘플)</span>
+                  )}
+                </span>
                 <span className="text-[10px] text-gray-500">
                   {new Date(entry.createdAt).toLocaleTimeString("ko-KR", {
                     hour: "2-digit",
