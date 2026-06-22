@@ -95,10 +95,10 @@ function CueRow({ row }: { row: CueSheetRow }) {
         >
           {row.no !== undefined ? `#${row.no}` : "·"}
         </span>
-        <span className="font-mono text-sm font-semibold text-gray-800 flex-1">
+        <span className="font-mono text-sm font-semibold text-black flex-1">
           {row.time}
         </span>
-        <span className="text-xs text-gray-400 font-medium">
+        <span className="text-xs text-black font-medium">
           {row.runTimes.includes(":") ? row.runTimes : `${row.runTimes}분`}
         </span>
       </div>
@@ -111,7 +111,7 @@ function CueRow({ row }: { row: CueSheetRow }) {
           </p>
         )}
         <p
-          className={`font-medium leading-snug ${isSpecial ? "text-gray-500 text-sm" : "text-gray-900 text-base"}`}
+          className={`font-medium leading-snug ${isSpecial ? "text-black text-sm" : "text-black text-base"}`}
         >
           {row.contents}
         </p>
@@ -172,13 +172,13 @@ export default function CuesheetPage() {
             style={{ background: "rgba(0,0,0,0.06)" }}
             aria-label="뒤로가기"
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-700">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-black">
               <path d="M15 18l-6-6 6-6" />
             </svg>
           </button>
           <div>
             <p className="text-xs font-medium" style={{ color: brandDark }}>몽골 선교팀</p>
-            <h1 className="text-xl font-bold text-gray-900">공연 큐시트</h1>
+            <h1 className="text-xl font-bold text-black">공연 큐시트</h1>
           </div>
         </div>
 
@@ -217,7 +217,7 @@ export default function CuesheetPage() {
             border: "1px solid rgba(22,101,52,0.15)",
           }}
         >
-          <p className="text-xs font-medium text-gray-500 mb-0.5">{active.date}</p>
+          <p className="text-xs font-medium text-black mb-0.5">{active.date}</p>
           <p className="text-base font-bold" style={{ color: brandDark }}>
             {active.venue}
           </p>
