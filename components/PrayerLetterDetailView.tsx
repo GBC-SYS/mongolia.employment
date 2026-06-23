@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import Image from "next/image";
 import { XMarkIcon, ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 import { type PrayerLetter } from "@/data/prayer-letters";
@@ -12,6 +13,10 @@ const isIOS = () =>
 
 export default function PrayerLetterDetailView({ letter }: { letter: PrayerLetter }) {
   const router = useRouter();
+
+  useEffect(() => {
+    router.prefetch("/prayer-letters");
+  }, [router]);
 
   const handleDownload = async () => {
     if (isIOS()) {
@@ -64,7 +69,8 @@ export default function PrayerLetterDetailView({ letter }: { letter: PrayerLette
       >
         <button
           onClick={handleClose}
-          className="w-10 h-10 flex items-center justify-center rounded-full bg-black/10 text-gray-700 active:bg-black/20 transition-colors"
+          className="w-10 h-10 flex items-center justify-center rounded-full bg-black/10 text-gray-700 active:bg-black/20 [touch-action:manipulation]"
+          aria-label="닫기"
         >
           <XMarkIcon width={22} height={22} />
         </button>
