@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { HomeIcon as HomeOutline, EnvelopeIcon as MailOutline, BookOpenIcon as BookOutline, MusicalNoteIcon as MusicOutline, HeartIcon as HeartOutline } from "@heroicons/react/24/outline";
 import { HomeIcon as HomeSolid, EnvelopeIcon as MailSolid, BookOpenIcon as BookSolid, MusicalNoteIcon as MusicSolid, HeartIcon as HeartSolid } from "@heroicons/react/24/solid";
@@ -16,8 +16,13 @@ const navItems = [
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const router = useRouter();
   const tabRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   const [pillStyle, setPillStyle] = useState<{ left: number; width: number } | null>(null);
+
+  useEffect(() => {
+    navItems.forEach(({ href }) => router.prefetch(href));
+  }, [router]);
 
   useEffect(() => {
     const idx = navItems.findIndex((item) => item.href === pathname);
@@ -69,7 +74,7 @@ export default function BottomNav() {
               key={href}
               href={href}
               ref={(el) => { tabRefs.current[i] = el; }}
-              className="relative flex items-center justify-center gap-1.5 py-2.5 transition-colors flex-1"
+              className="relative flex items-center justify-center gap-1.5 py-2.5 flex-1 [touch-action:manipulation]"
               style={{ color: isActive ? "#111" : "#6b7280" }}
             >
               <IconComponent
