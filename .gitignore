@@ -42,3 +42,7 @@ next-env.d.ts
 
 # claude
 .claude/
+
+# PWA 빌드 생성물 (public/sw.ts → public/sw.js, 매 빌드마다 재생성됨)
+/public/sw.js
+/public/sw.js.map

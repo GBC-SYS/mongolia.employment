@@ -28,12 +28,19 @@ export const viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
+  themeColor: "#166534",
 };
 
 export const metadata: Metadata = {
   title: "몽골 선교 2026",
   description: "몽골 선교 2026 기도편지 함께 기도해 주세요 🙏",
   metadataBase: new URL("https://mongolia-employment.vercel.app"),
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "몽골선교",
+  },
   openGraph: {
     title: "몽골 선교 2026",
     description: "몽골 선교 2026 기도편지 함께 기도해 주세요",
@@ -49,6 +56,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" className={`h-full ${pretendard.variable}`}>
+      <head>
+        {/* apple-touch-icon과 mobile-web-app-capable은 Next.js metadata API로 제어 불가 */}
+        <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+        <meta name="mobile-web-app-capable" content="yes" />
+      </head>
       {/*
         모바일: body 전체가 앱
         데스크탑: 왼쪽 장식 패널 + 오른쪽 390px 앱 패널 (flex)
@@ -134,6 +146,12 @@ export default function RootLayout({
           </div>
 
         </RecoilProvider>
+        {/* Service Worker 등록 — load 이벤트 후 실행해 초기 로드 성능에 영향 없게 함 */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `if('serviceWorker'in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(e){console.error('SW 등록 실패:',e);})})}`,
+          }}
+        />
       </body>
     </html>
   );
