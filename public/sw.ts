@@ -40,6 +40,22 @@ const serwist = new Serwist({
     ],
   },
   runtimeCaching: [
+    // Next.js RSC 페이로드 (?_rsc=): 클라이언트 사이드 네비게이션 시 발생
+    // HTML 대신 JSON 페이로드를 fetch로 요청하므로 별도 캐시 필요
+    {
+      matcher: ({ url }) => url.searchParams.has("_rsc"),
+      handler: new NetworkFirst({
+        cacheName: "rsc-payloads",
+        networkTimeoutSeconds: 5,
+        plugins: [
+          new ExpirationPlugin({
+            maxEntries: 32,
+            maxAgeSeconds: 60 * 60 * 24,
+          }),
+        ],
+      }),
+    },
+
     // force-dynamic 페이지: NetworkFirst (5초 타임아웃 후 캐시 폴백)
     {
       matcher: ({ url }) =>
