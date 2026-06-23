@@ -3,36 +3,23 @@ import { mkdir } from "fs/promises";
 
 await mkdir("public/icons", { recursive: true });
 
-const src = "public/images/thumbnail2.webp";
-// thumbnail2.webp는 1457x720 — 중앙 720x720 크롭
-const cropLeft = Math.floor((1457 - 720) / 2); // 368
+const src = "public/images/mongolia-mission-2026-hero.webp";
+// 1024x1024 정사각형 — 크롭 없이 바로 리사이즈
 
 // icon-512.png
-await sharp(src)
-  .extract({ left: cropLeft, top: 0, width: 720, height: 720 })
-  .resize(512, 512)
-  .toFile("public/icons/icon-512.png");
+await sharp(src).resize(512, 512).toFile("public/icons/icon-512.png");
 
 // icon-192.png
-await sharp(src)
-  .extract({ left: cropLeft, top: 0, width: 720, height: 720 })
-  .resize(192, 192)
-  .toFile("public/icons/icon-192.png");
+await sharp(src).resize(192, 192).toFile("public/icons/icon-192.png");
 
 // apple-touch-icon.png (iOS Safari 홈 화면 추가용)
-await sharp(src)
-  .extract({ left: cropLeft, top: 0, width: 720, height: 720 })
-  .resize(180, 180)
-  .toFile("public/icons/apple-touch-icon.png");
+await sharp(src).resize(180, 180).toFile("public/icons/apple-touch-icon.png");
 
 // icon-maskable-512.png (Android 적응형 아이콘 — 브랜드 그린 배경 + 중앙 80% 이미지)
 const innerSize = 410; // 512의 80% = safe zone
 const padding = Math.floor((512 - innerSize) / 2); // 51px
 
-const innerBuffer = await sharp(src)
-  .extract({ left: cropLeft, top: 0, width: 720, height: 720 })
-  .resize(innerSize, innerSize)
-  .toBuffer();
+const innerBuffer = await sharp(src).resize(innerSize, innerSize).toBuffer();
 
 await sharp({
   create: {
