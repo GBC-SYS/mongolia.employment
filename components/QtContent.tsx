@@ -71,16 +71,15 @@ function DebriefingForm({ day }: { day: number }) {
   const [submitting, setSubmitting] = useState(false);
   const [entries, setEntries] = useState<QtDebriefing[]>([]);
   const [loadingEntries, setLoadingEntries] = useState(true);
-  const [myIds, setMyIds] = useState<Set<string>>(new Set());
+  // lazy initializer: 렌더 시점에 localStorage를 직접 읽어 초기값 계산 → effect 불필요
+  const [myIds, setMyIds] = useState<Set<string>>(() =>
+    typeof window === "undefined" ? new Set() : loadMyIds()
+  );
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editGrace, setEditGrace] = useState("");
   const [editImprovement, setEditImprovement] = useState("");
   const [saving, setSaving] = useState(false);
   const [confirmTarget, setConfirmTarget] = useState<string | null>(null);
-
-  useEffect(() => {
-    setMyIds(loadMyIds());
-  }, []);
 
   const fetchEntries = useCallback(async (signal?: AbortSignal) => {
     setLoadingEntries(true);

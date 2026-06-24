@@ -29,15 +29,14 @@ export default function PrayerAnswerSection({ letterId }: { letterId: string }) 
   const [content, setContent] = useState("");
   const [fetching, setFetching] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [myIds, setMyIds] = useState<Set<string>>(new Set());
+  // lazy initializer: 렌더 시점에 localStorage를 직접 읽어 초기값 계산 → effect 불필요
+  const [myIds, setMyIds] = useState<Set<string>>(() =>
+    typeof window === "undefined" ? new Set() : loadMyIds()
+  );
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
   const [saving, setSaving] = useState(false);
   const [confirmTarget, setConfirmTarget] = useState<string | null>(null);
-
-  useEffect(() => {
-    setMyIds(loadMyIds());
-  }, []);
 
   useEffect(() => {
     let cancelled = false;
