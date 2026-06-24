@@ -259,20 +259,30 @@ function DebriefingForm({ day }: { day: number }) {
                       })}
                     </span>
                     {isMine && !isEditing && (
-                      <>
+                      <div className="flex items-center gap-1">
                         <button
                           onClick={() => startEdit(entry)}
-                          className="text-[10px] text-blue-500 font-medium active:opacity-60 min-h-[44px] px-2 flex items-center"
+                          className="text-[10px] font-semibold px-2.5 py-1 rounded-full active:scale-95 transition-transform"
+                          style={{
+                            background: "rgba(59,130,246,0.1)",
+                            color: "#2563eb",
+                            border: "1px solid rgba(59,130,246,0.25)",
+                          }}
                         >
                           수정
                         </button>
                         <button
                           onClick={() => handleDelete(entry.id)}
-                          className="text-[10px] text-red-400 font-medium active:opacity-60 min-h-[44px] px-2 flex items-center"
+                          className="text-[10px] font-semibold px-2.5 py-1 rounded-full active:scale-95 transition-transform"
+                          style={{
+                            background: "rgba(239,68,68,0.1)",
+                            color: "#dc2626",
+                            border: "1px solid rgba(239,68,68,0.25)",
+                          }}
                         >
                           삭제
                         </button>
-                      </>
+                      </div>
                     )}
                   </div>
                 </div>
