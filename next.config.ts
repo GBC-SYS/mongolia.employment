@@ -46,6 +46,9 @@ const withSerwist = withSerwistInit({
 });
 
 const nextConfig: NextConfig = {
+  // Next.js 16에서 @serwist/next webpack 주입 시 turbopack 설정 누락 에러 방지용
+  // next build는 webpack 사용, next dev만 Turbopack 적용됨
+  turbopack: {},
   outputFileTracingIncludes: {
     "/api/thumbnail/[id]": ["./public/images/prayer-letters/**"],
   },
