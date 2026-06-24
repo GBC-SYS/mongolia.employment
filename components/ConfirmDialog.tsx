@@ -1,6 +1,7 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -19,11 +20,37 @@ export default function ConfirmDialog({
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
-  if (!open) return null;
+  const [mounted, setMounted] = useState(false);
 
-  return (
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // ESC 키로 다이얼로그 닫기 (접근성 + UX)
+  useEffect(() => {
+    if (!open) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onCancel();
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [open, onCancel]);
+
+  if (!open || !mounted) return null;
+
+  // 모바일: fixed(뷰포트 기준) / 데스크탑 lg: absolute(#app-panel 기준)
+  // backdrop-filter 조상은 fixed 자식만 containing block으로 가두므로
+  // lg에서 absolute로 전환하면 390px 패널 안에만 노출됨
+  // #app-panel은 lg:absolute이므로 containing block 역할을 수행함
+  const target = document.getElementById("app-panel") ?? document.body;
+
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center px-6"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="confirm-dialog-title"
+      aria-describedby="confirm-dialog-message"
+      className="fixed inset-0 lg:absolute lg:inset-0 z-[9999] flex items-center justify-center px-6"
       style={{ background: "rgba(0,0,0,0.5)" }}
       onClick={onCancel}
     >
@@ -38,14 +65,16 @@ export default function ConfirmDialog({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start gap-3 mb-4">
-          <span className="text-xl mt-0.5">⚠️</span>
+          {/* aria-hidden: 장식 이모지는 스크린 리더에서 무시 */}
+          <span className="text-xl mt-0.5" aria-hidden="true">⚠️</span>
           <div>
-            <p className="text-sm font-bold text-gray-900 mb-1">{title}</p>
-            <p className="text-xs text-gray-600 leading-5">{message}</p>
+            <p id="confirm-dialog-title" className="text-sm font-bold text-gray-900 mb-1">{title}</p>
+            <p id="confirm-dialog-message" className="text-xs text-gray-600 leading-5">{message}</p>
           </div>
         </div>
         <div className="flex gap-2">
           <button
+            type="button"
             onClick={onCancel}
             className="flex-1 py-3 rounded-xl text-sm font-semibold text-gray-600 active:scale-95 transition-transform"
             style={{
@@ -56,6 +85,7 @@ export default function ConfirmDialog({
             취소
           </button>
           <button
+            type="button"
             onClick={onConfirm}
             className="flex-1 py-3 rounded-xl text-sm font-semibold text-white active:scale-95 transition-transform"
             style={{ background: "#dc2626" }}
@@ -64,6 +94,7 @@ export default function ConfirmDialog({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    target
   );
 }

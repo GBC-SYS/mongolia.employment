@@ -76,6 +76,48 @@ yarn lint     # ESLint 실행
 | UI 컴포넌트 | shadcn/ui (수동 작성) | `components/ui/` — Tailwind v4 호환 버전 |
 | 아이콘 | iconoir-react | SVG 아이콘, `width/height/strokeWidth` props |
 | 상태 관리 | **Jotai** | Recoil 대체 (React 19 호환) |
+| 백엔드 | **Supabase** | PostgreSQL, 서버사이드 전용 (`SUPABASE_SERVICE_ROLE_KEY`) |
+| PWA | @serwist/next | 서비스워커 — 개발 환경에서는 비활성화 |
+
+---
+
+## 백엔드 (Supabase)
+
+### 클라이언트 설정
+
+`lib/db.ts` — 서버 전용 Supabase 클라이언트. **클라이언트 컴포넌트에서 직접 import 금지** (Service Role Key 노출 위험).
+
+```ts
+// 서버에서만 사용 (API Route, Server Action)
+import { getQtDebriefings, addQtDebriefing } from "@/lib/db";
+```
+
+### 환경변수
+
+| 키 | 설명 | 위치 |
+|----|------|------|
+| `SUPABASE_URL` | Supabase 프로젝트 URL | `.env` + Vercel |
+| `SUPABASE_SERVICE_ROLE_KEY` | 서버 전용 Service Role Key | `.env` + Vercel |
+| `NEXT_PUBLIC_KAKAO_APP_KEY` | 카카오 JS SDK 키 | `.env.local` + Vercel |
+
+### DB 테이블 & 함수 (`lib/db.ts`)
+
+| 테이블 | 주요 컬럼 | 함수 |
+|--------|----------|------|
+| `qt_debriefings` | id, day(1-7), author, grace, improvement, created_at | `getQtDebriefings(day)`, `addQtDebriefing(day, data)` |
+| `prayer_answers` | id, letter_id, author, content, created_at | `getPrayerAnswers(letterId)`, `addPrayerAnswer(letterId, data)` |
+| `prayer_count` | id, count | `getPrayerCount()`, `incrementPrayerCount()` (RPC) |
+
+### API Routes
+
+| 경로 | 메서드 | 설명 |
+|------|--------|------|
+| `/api/qt-debriefing` | GET `?day=N`, POST | QT 디브리핑 조회/등록 |
+| `/api/prayer-answer/[letterId]` | GET, POST | 기도응답 조회/등록 |
+| `/api/prayer-count` | GET, POST | 기도 카운트 조회/증가 |
+| `/api/thumbnail/[id]` | GET | 기도편지 썸네일 이미지 |
+
+> **클라이언트 → API Route → lib/db.ts → Supabase** 구조를 반드시 지킬 것.
 
 ---
 
@@ -91,12 +133,20 @@ app/
 
 components/
   BottomNav.tsx             # 하단 고정 네비게이션 (usePathname 활성탭)
+  BackButton.tsx            # 뒤로가기 버튼 — fallback prop, document.referrer 안전 처리
   Countdown.tsx             # D-day 카운트다운 — 출발일 2026-06-28 기준
   ImageViewer.tsx           # 기도편지 그리드 + 전체화면 모달
   GuideAccordion.tsx        # 아코디언 — Jotai guideOpenSectionsAtom
   Checklist.tsx             # 준비물 체크리스트 — Jotai + localStorage
   ClientOnly.tsx            # Jotai 컴포넌트 SSR 방지 래퍼 (mounted 상태 체크)
   RecoilProvider.tsx        # Jotai <Provider> 래퍼 (이름은 Recoil이지만 내부는 Jotai)
+  KakaoShareButton.tsx      # 카카오 공유 버튼 — NEXT_PUBLIC_KAKAO_APP_KEY 필요
+  PhraseEnlargeModal.tsx    # 구문집 확대 모달
+  PrayerAnswerSection.tsx   # 기도응답 나눔 CRUD — /api/prayer-answer/[letterId] 호출
+  PrayerHeartButton.tsx     # 기도 카운트 하트 버튼 — /api/prayer-count 호출
+  PrayerLetterDetailView.tsx# 기도편지 상세 뷰어
+  QtContent.tsx             # QT 본문 + DebriefingForm — /api/qt-debriefing 호출
+  QtDayTabs.tsx             # QT 일차 탭 — Jotai qtSelectedDayAtom
   ui/
     button.tsx              # shadcn Button (variant: default/outline/ghost/destructive)
     card.tsx                # shadcn Card, CardHeader, CardTitle, CardContent
@@ -107,13 +157,16 @@ store/
 
 lib/
   utils.ts                  # cn() — clsx + tailwind-merge
+  db.ts                     # Supabase 클라이언트 + DB 함수 (서버 전용)
 
 data/
   prayer-letters.ts         # PrayerLetter[] 정적 배열 (수동 관리)
-  guide-content.ts          # 가이드북 전체 정적 데이터
+  guide-content.ts          # 가이드북 전체 정적 데이터 + songData
+  qt-content.ts             # QT 7일 묵상 데이터 (qtDays[])
 
 public/
   images/prayer-letters/    # 기도편지 이미지 파일 저장 위치
+  audio/phrasebook/         # 구문집 오디오 (mp3/m4a)
 ```
 
 ---
@@ -157,10 +210,13 @@ public/
 ### atoms (`store/atoms.ts`)
 
 ```ts
-selectedLetterAtom      // 기도편지 전체화면에서 선택된 이미지 id (string | null)
-guideOpenSectionsAtom   // 가이드북 섹션 열림 상태 { weather, checklist, safety, emergency }
-checklistAtom           // 체크리스트 체크 상태 Record<string, boolean>
-                        // → localStorage "mongol-checklist" 키에 동기화
+selectedLetterAtom          // 기도편지 전체화면 선택 id (string | null)
+guideOpenSectionsAtom       // 가이드북 섹션 열림 { weather, checklist, accommodation, safety, emergency }
+checklistAtom               // 체크리스트 체크 상태 Record<string, boolean> → localStorage 동기화
+phrasebookOpenSectionsAtom  // 구문집 카테고리 열림 { greeting, blessing, confession, gospel, vocab, daily }
+enlargedPhraseAtom          // 구문집 확대 모달 { mn, pron } | null
+qtSelectedDayAtom           // QT 선택 일차 (1-7, 기본값 1)
+qtVerseOpenAtom             // QT 성경 본문 펼침 여부 (boolean)
 ```
 
 ### SSR 충돌 방지 규칙

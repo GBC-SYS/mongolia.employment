@@ -138,7 +138,9 @@ export default function RootLayout({
             모바일: w-full, 일반 스크롤
             데스크탑: w-[390px] 고정, h-screen 내부 스크롤, BottomNav 하단 고정
           */}
-          <div className="w-full lg:absolute lg:right-[190px] lg:top-0 lg:w-[390px] lg:h-screen lg:flex lg:flex-col lg:z-10 lg:[backdrop-filter:blur(2px)]">
+          {/* #app-panel: absolute로 배치되어 containing block 역할 수행 */}
+          {/* ConfirmDialog는 이 엘리먼트에 createPortal하여 lg:absolute inset-0 전략으로 패널 내부에 렌더링 */}
+          <div id="app-panel" className="w-full lg:absolute lg:right-[190px] lg:top-0 lg:w-[390px] lg:h-screen lg:flex lg:flex-col lg:z-10 lg:[backdrop-filter:blur(2px)]">
             <div className="flex-1 lg:overflow-y-auto lg:[scrollbar-width:none] lg:[&::-webkit-scrollbar]:hidden">
               <main className="lg:pb-0">{children}</main>
             </div>

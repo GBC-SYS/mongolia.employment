@@ -57,11 +57,13 @@ const serwist = new Serwist({
     },
 
     // force-dynamic 페이지: NetworkFirst (5초 타임아웃 후 캐시 폴백)
+    // /prayer-letters/001~031 상세 페이지는 SSG precache 대상이므로 제외
+    // \d{3} 으로 세 자리 숫자 ID만 정확하게 매칭 (\w+는 영문자/언더스코어도 허용해 의도 불명확)
     {
       matcher: ({ url }) =>
         DYNAMIC_PAGES.some(
           (p) => url.pathname === p || url.pathname.startsWith(p + "/")
-        ),
+        ) && !/^\/prayer-letters\/\d{3}$/.test(url.pathname),
       handler: new NetworkFirst({
         cacheName: "dynamic-pages",
         networkTimeoutSeconds: 5,
