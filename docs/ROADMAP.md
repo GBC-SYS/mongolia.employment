@@ -75,8 +75,8 @@
 - [x] 후원 계좌 복사 버튼 (카카오뱅크, iOS Private Mode 대응)
 
 ### 전도 구문집 (`/phrasebook`) — 2026-06-16 추가 (커밋 fe1e79d)
-- [x] 4개 섹션: 기본 인사 & 자기소개 / 축복 & 사랑의 표현 / 복음 핵심 메시지 / 일상 표현
-- [x] 복음 핵심 메시지 섹션 — 번호 있는 10단계 전도 시퀀스
+- [x] 4개 섹션: 기본 인사 & 자기소개 / 축복과 사랑의 표현 / 전도팀 복음 용어 / 일상 표현
+- [x] 전도팀 복음 용어 섹션 — 번호 있는 10단계 전도 시퀀스
 - [x] Jotai atoms 추가: `phrasebookOpenSectionsAtom` (`store/atoms.ts`)
 - [x] `GuideAccordion`에 `openOverride`/`onToggle` 선택적 props 추가 (별도 atom 재사용 가능)
 - [x] 외부 API 없는 순수 정적 구문집 — 오프라인 동작
@@ -86,8 +86,8 @@
 
 > 2026-06-16 추가 — MP3 파일 네이밍 규칙: `{섹션키}_{인덱스}.mp3` (예: `gospel_0.mp3`)
 
-- [x] MP3 오디오 재생 — 복음 핵심 메시지 10문장 (`gospel_0.mp3` ~ `gospel_9.mp3`)
-- [x] MP3 오디오 재생 — 축복 & 사랑의 표현 6문장 (`blessing_0.mp3` ~ `blessing_5.mp3`)
+- [x] MP3 오디오 재생 — 전도팀 복음 용어 10문장 (`gospel_0.mp3` ~ `gospel_9.mp3`)
+- [x] MP3 오디오 재생 — 축복과 사랑의 표현 6문장 (`blessing_0.mp3` ~ `blessing_5.mp3`)
 - [x] Web Speech API TTS — MP3 없는 구문(기본 인사·일상 표현) 대상 `mn-MN` 음성 합성
 - [x] 가라오케 하이라이팅 — MP3 재생 중 발음 텍스트 단어별 형광 강조 (`setInterval` 80ms)
 - [x] TTS 가라오케 — `onboundary` 이벤트 기반 단어별 실시간 강조
