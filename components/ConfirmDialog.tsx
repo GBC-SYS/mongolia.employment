@@ -1,9 +1,11 @@
 "use client";
 
+import React from "react";
+
 interface ConfirmDialogProps {
   open: boolean;
   title: string;
-  message: string;
+  message: React.ReactNode;
   confirmLabel?: string;
   onConfirm: () => void;
   onCancel: () => void;

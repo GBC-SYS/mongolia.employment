@@ -122,7 +122,7 @@ export default function PrayerAnswerSection({ letterId }: { letterId: string }) 
     <ConfirmDialog
       open={confirmTarget !== null}
       title="이 기도응답을 삭제하시겠습니까?"
-      message="삭제된 기록은 복구할 수 없습니다. 다른 팀원의 기록일 수 있으니 신중하게 결정해 주세요."
+      message={<>삭제된 기록은 복구할 수 없습니다.<br />다른 팀원의 기록일 수 있으니 신중하게 결정해 주세요.</>}
       onConfirm={confirmDelete}
       onCancel={() => setConfirmTarget(null)}
     />
