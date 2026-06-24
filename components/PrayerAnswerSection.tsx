@@ -3,18 +3,51 @@
 import { useState, useEffect } from "react";
 import { type PrayerAnswer } from "@/lib/db";
 
+const PA_IDS_KEY = "mongol-pa-ids";
+
+function loadMyIds(): Set<string> {
+  try {
+    const raw = localStorage.getItem(PA_IDS_KEY);
+    return new Set(raw ? JSON.parse(raw) : []);
+  } catch {
+    return new Set();
+  }
+}
+
+function saveMyIds(ids: Set<string>) {
+  try {
+    localStorage.setItem(PA_IDS_KEY, JSON.stringify([...ids]));
+  } catch {
+    // Private Mode
+  }
+}
+
 export default function PrayerAnswerSection({ letterId }: { letterId: string }) {
   const [answers, setAnswers] = useState<PrayerAnswer[]>([]);
   const [author, setAuthor] = useState("");
   const [content, setContent] = useState("");
   const [fetching, setFetching] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [myIds, setMyIds] = useState<Set<string>>(new Set());
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editContent, setEditContent] = useState("");
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
+    setMyIds(loadMyIds());
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
     fetch(`/api/prayer-answer/${letterId}`)
-      .then((r) => r.json())
-      .then(setAnswers)
-      .finally(() => setFetching(false));
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
+      .then((data) => { if (!cancelled) setAnswers(data); })
+      .catch(() => { if (!cancelled) setAnswers([]); })
+      .finally(() => { if (!cancelled) setFetching(false); });
+    return () => { cancelled = true; };
   }, [letterId]);
 
   const handleSubmit = async () => {
@@ -29,6 +62,10 @@ export default function PrayerAnswerSection({ letterId }: { letterId: string }) 
       if (res.ok) {
         const newAnswer: PrayerAnswer = await res.json();
         setAnswers((prev) => [newAnswer, ...prev]);
+        const updated = new Set(myIds);
+        updated.add(newAnswer.id);
+        setMyIds(updated);
+        saveMyIds(updated);
         setContent("");
         setAuthor("");
       }
@@ -36,6 +73,41 @@ export default function PrayerAnswerSection({ letterId }: { letterId: string }) 
       setSubmitting(false);
     }
   };
+
+  async function handleUpdate(id: string) {
+    if (!editContent.trim()) return;
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/prayer-answer/item/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: editContent }),
+      });
+      if (!res.ok) throw new Error();
+      const { answer } = await res.json();
+      setAnswers((prev) => prev.map((a) => (a.id === id ? answer : a)));
+      setEditingId(null);
+    } catch {
+      alert("수정 중 오류가 발생했습니다.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleDelete(id: string) {
+    if (!confirm("이 기도응답을 삭제할까요?")) return;
+    try {
+      const res = await fetch(`/api/prayer-answer/item/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error();
+      const updated = new Set(myIds);
+      updated.delete(id);
+      setMyIds(updated);
+      saveMyIds(updated);
+      setAnswers((prev) => prev.filter((a) => a.id !== id));
+    } catch {
+      alert("삭제 중 오류가 발생했습니다.");
+    }
+  }
 
   return (
     <div className="px-4 pt-2 pb-6">
@@ -82,23 +154,72 @@ export default function PrayerAnswerSection({ letterId }: { letterId: string }) 
         </p>
       ) : (
         <div className="space-y-3">
-          {answers.map((a) => (
-            <div
-              key={a.id}
-              className="rounded-2xl px-4 py-3 border border-black/8"
-              style={{ background: "rgba(255,255,255,0.92)" }}
-            >
-              <div className="flex justify-between items-center mb-1">
-                <span className="text-xs font-semibold text-green-700">{a.author}</span>
-                <span className="text-xs text-gray-400">
-                  {new Date(a.createdAt).toLocaleDateString("ko-KR")}
-                </span>
+          {answers.map((a) => {
+            const isMine = myIds.has(a.id);
+            const isEditing = editingId === a.id;
+            return (
+              <div
+                key={a.id}
+                className="rounded-2xl px-4 py-3 border border-black/8"
+                style={{ background: "rgba(255,255,255,0.92)" }}
+              >
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-xs font-semibold text-green-700">{a.author}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-gray-400">
+                      {new Date(a.createdAt).toLocaleDateString("ko-KR")}
+                    </span>
+                    {isMine && !isEditing && (
+                      <>
+                        <button
+                          onClick={() => { setEditingId(a.id); setEditContent(a.content ?? ""); }}
+                          className="text-[10px] text-blue-500 font-medium active:opacity-60 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                        >
+                          수정
+                        </button>
+                        <button
+                          onClick={() => handleDelete(a.id)}
+                          className="text-[10px] text-red-400 font-medium active:opacity-60 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                        >
+                          삭제
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+                {isEditing ? (
+                  <div className="space-y-2 mt-2">
+                    <textarea
+                      value={editContent}
+                      onChange={(e) => setEditContent(e.target.value)}
+                      rows={3}
+                      className="w-full text-sm bg-gray-100 rounded-xl px-3 py-2 outline-none resize-none text-gray-900 border border-gray-200"
+                      style={{ fontSize: 16 }}
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleUpdate(a.id)}
+                        disabled={saving}
+                        className="flex-1 py-1.5 rounded-xl text-xs font-semibold text-white bg-green-700 disabled:opacity-40"
+                      >
+                        {saving ? "저장 중…" : "저장"}
+                      </button>
+                      <button
+                        onClick={() => setEditingId(null)}
+                        className="flex-1 py-1.5 rounded-xl text-xs font-semibold text-gray-600 bg-gray-100"
+                      >
+                        취소
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                    {a.content}
+                  </p>
+                )}
               </div>
-              <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
-                {a.content}
-              </p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

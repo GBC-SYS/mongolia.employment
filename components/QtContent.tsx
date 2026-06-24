@@ -44,6 +44,25 @@ function VerseBlock({ verses, passage }: { verses: string; passage: string }) {
   );
 }
 
+const QT_IDS_KEY = "mongol-qt-ids";
+
+function loadMyIds(): Set<string> {
+  try {
+    const raw = localStorage.getItem(QT_IDS_KEY);
+    return new Set(raw ? JSON.parse(raw) : []);
+  } catch {
+    return new Set();
+  }
+}
+
+function saveMyIds(ids: Set<string>) {
+  try {
+    localStorage.setItem(QT_IDS_KEY, JSON.stringify([...ids]));
+  } catch {
+    // Private Mode
+  }
+}
+
 function DebriefingForm({ day }: { day: number }) {
   const [author, setAuthor] = useState("");
   const [grace, setGrace] = useState("");
@@ -51,6 +70,15 @@ function DebriefingForm({ day }: { day: number }) {
   const [submitting, setSubmitting] = useState(false);
   const [entries, setEntries] = useState<QtDebriefing[]>([]);
   const [loadingEntries, setLoadingEntries] = useState(true);
+  const [myIds, setMyIds] = useState<Set<string>>(new Set());
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editGrace, setEditGrace] = useState("");
+  const [editImprovement, setEditImprovement] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    setMyIds(loadMyIds());
+  }, []);
 
   const fetchEntries = useCallback(async (signal?: AbortSignal) => {
     setLoadingEntries(true);
@@ -82,15 +110,59 @@ function DebriefingForm({ day }: { day: number }) {
         body: JSON.stringify({ day, author, grace, improvement }),
       });
       if (!res.ok) throw new Error();
+      const { entry } = await res.json();
+      const updated = new Set(myIds);
+      updated.add(entry.id);
+      setMyIds(updated);
+      saveMyIds(updated);
       setAuthor("");
       setGrace("");
-
       setImprovement("");
-      await fetchEntries();
+      setEntries((prev) => [entry, ...prev]);
     } catch {
       alert("저장 중 오류가 발생했습니다. 다시 시도해 주세요.");
     } finally {
       setSubmitting(false);
+    }
+  }
+
+  function startEdit(entry: QtDebriefing) {
+    setEditingId(entry.id);
+    setEditGrace(entry.grace ?? "");
+    setEditImprovement(entry.improvement ?? "");
+  }
+
+  async function handleUpdate(id: string) {
+    if (!editGrace.trim() && !editImprovement.trim()) return;
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/qt-debriefing/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ grace: editGrace, improvement: editImprovement }),
+      });
+      if (!res.ok) throw new Error();
+      setEditingId(null);
+      await fetchEntries();
+    } catch {
+      alert("수정 중 오류가 발생했습니다.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleDelete(id: string) {
+    if (!confirm("이 디브리핑을 삭제할까요?")) return;
+    try {
+      const res = await fetch(`/api/qt-debriefing/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error();
+      const updated = new Set(myIds);
+      updated.delete(id);
+      setMyIds(updated);
+      saveMyIds(updated);
+      setEntries((prev) => prev.filter((e) => e.id !== id));
+    } catch {
+      alert("삭제 중 오류가 발생했습니다.");
     }
   }
 
@@ -159,56 +231,126 @@ function DebriefingForm({ day }: { day: number }) {
       ) : entries.length > 0 ? (
         <div className="space-y-2">
           <p className="text-xs font-semibold text-gray-700 px-1">팀원들의 디브리핑</p>
-          {entries.map((entry) => (
-            <div
-              key={entry.id}
-              className="rounded-2xl px-4 py-3"
-              style={{
-                background: "rgba(255,255,255,0.6)",
-                border: "1px solid rgba(255,255,255,0.8)",
-              }}
-            >
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs font-semibold text-green-700">
-                  {entry.author}
-                  {entry.author === "홍길동" && (
-                    <span className="ml-1 font-normal text-gray-400">(샘플)</span>
-                  )}
-                </span>
-                <span className="text-[10px] text-gray-500">
-                  {new Date(entry.createdAt).toLocaleTimeString("ko-KR", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    timeZone: "Asia/Seoul",
-                  })}
-                </span>
+          {entries.map((entry) => {
+            const isMine = myIds.has(entry.id);
+            const isEditing = editingId === entry.id;
+            return (
+              <div
+                key={entry.id}
+                className="rounded-2xl px-4 py-3"
+                style={{
+                  background: "rgba(255,255,255,0.6)",
+                  border: "1px solid rgba(255,255,255,0.8)",
+                }}
+              >
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-xs font-semibold text-green-700">
+                    {entry.author}
+                    {entry.author === "홍길동" && (
+                      <span className="ml-1 font-normal text-gray-400">(샘플)</span>
+                    )}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-gray-500">
+                      {new Date(entry.createdAt).toLocaleTimeString("ko-KR", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        timeZone: "Asia/Seoul",
+                      })}
+                    </span>
+                    {isMine && !isEditing && (
+                      <>
+                        <button
+                          onClick={() => startEdit(entry)}
+                          className="text-[10px] text-blue-500 font-medium active:opacity-60 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                        >
+                          수정
+                        </button>
+                        <button
+                          onClick={() => handleDelete(entry.id)}
+                          className="text-[10px] text-red-400 font-medium active:opacity-60 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                        >
+                          삭제
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {isEditing ? (
+                  <div className="space-y-2 mt-2">
+                    <textarea
+                      value={editGrace}
+                      onChange={(e) => setEditGrace(e.target.value)}
+                      rows={3}
+                      placeholder="은혜"
+                      className="w-full rounded-xl px-3 py-2 text-xs text-gray-800 placeholder-gray-400 outline-none resize-none"
+                      style={{
+                        background: "rgba(250,250,245,0.9)",
+                        border: "1px solid rgba(22,163,74,0.3)",
+                        fontSize: 16,
+                      }}
+                    />
+                    <textarea
+                      value={editImprovement}
+                      onChange={(e) => setEditImprovement(e.target.value)}
+                      rows={2}
+                      placeholder="개선점"
+                      className="w-full rounded-xl px-3 py-2 text-xs text-gray-800 placeholder-gray-400 outline-none resize-none"
+                      style={{
+                        background: "rgba(250,250,245,0.9)",
+                        border: "1px solid rgba(22,163,74,0.3)",
+                        fontSize: 16,
+                      }}
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleUpdate(entry.id)}
+                        disabled={saving}
+                        className="flex-1 py-1.5 rounded-xl text-xs font-semibold text-white disabled:opacity-40"
+                        style={{ background: "#16A34A" }}
+                      >
+                        {saving ? "저장 중…" : "저장"}
+                      </button>
+                      <button
+                        onClick={() => setEditingId(null)}
+                        className="flex-1 py-1.5 rounded-xl text-xs font-semibold text-gray-600 bg-gray-100"
+                      >
+                        취소
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    {entry.grace && (
+                      <div className="mb-1.5 flex items-start gap-1.5" role="note" aria-label={`은혜: ${entry.grace}`}>
+                        <span
+                          className="flex-shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded-md mt-0.5"
+                          aria-hidden="true"
+                          style={{ background: "rgba(22,163,74,0.12)", color: "#15803d" }}
+                        >
+                          은혜
+                        </span>
+                        <span className="text-xs text-gray-800 leading-5">{entry.grace}</span>
+                      </div>
+                    )}
+                    {entry.improvement && (
+                      <div className="flex items-start gap-1.5" role="note" aria-label={`개선: ${entry.improvement}`}>
+                        <span
+                          className="flex-shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded-md mt-0.5"
+                          aria-hidden="true"
+                          style={{ background: "rgba(245,158,11,0.12)", color: "#b45309" }}
+                        >
+                          개선
+                        </span>
+                        <span className="text-xs text-gray-800 leading-5">{entry.improvement}</span>
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
-              {entry.grace && (
-                <div className="mb-1.5 flex items-start gap-1.5" role="note" aria-label={`은혜: ${entry.grace}`}>
-                  <span
-                    className="flex-shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded-md mt-0.5"
-                    aria-hidden="true"
-                    style={{ background: "rgba(22,163,74,0.12)", color: "#15803d" }}
-                  >
-                    은혜
-                  </span>
-                  <span className="text-xs text-gray-800 leading-5">{entry.grace}</span>
-                </div>
-              )}
-              {entry.improvement && (
-                <div className="flex items-start gap-1.5" role="note" aria-label={`개선: ${entry.improvement}`}>
-                  <span
-                    className="flex-shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded-md mt-0.5"
-                    aria-hidden="true"
-                    style={{ background: "rgba(245,158,11,0.12)", color: "#b45309" }}
-                  >
-                    개선
-                  </span>
-                  <span className="text-xs text-gray-800 leading-5">{entry.improvement}</span>
-                </div>
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : null}
     </div>

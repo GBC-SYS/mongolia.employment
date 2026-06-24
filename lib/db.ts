@@ -70,6 +70,34 @@ export async function addQtDebriefing(
   };
 }
 
+export async function updateQtDebriefing(
+  id: string,
+  data: { grace?: string; improvement?: string }
+): Promise<QtDebriefing> {
+  const updates: Record<string, string> = {};
+  if (data.grace !== undefined) updates.grace = data.grace;
+  if (data.improvement !== undefined) updates.improvement = data.improvement;
+  const { data: row, error } = await supabase
+    .from("qt_debriefings")
+    .update(updates)
+    .eq("id", id)
+    .select()
+    .single();
+  if (error) throw error;
+  return {
+    id: row.id,
+    author: row.author,
+    grace: row.grace,
+    improvement: row.improvement,
+    createdAt: row.created_at,
+  };
+}
+
+export async function deleteQtDebriefing(id: string): Promise<void> {
+  const { error } = await supabase.from("qt_debriefings").delete().eq("id", id);
+  if (error) throw error;
+}
+
 export async function getPrayerAnswers(letterId: string): Promise<PrayerAnswer[]> {
   const { data, error } = await supabase
     .from("prayer_answers")
@@ -83,6 +111,30 @@ export async function getPrayerAnswers(letterId: string): Promise<PrayerAnswer[]
     content: row.content,
     createdAt: row.created_at,
   }));
+}
+
+export async function updatePrayerAnswer(
+  id: string,
+  data: { content: string }
+): Promise<PrayerAnswer> {
+  const { data: row, error } = await supabase
+    .from("prayer_answers")
+    .update({ content: data.content })
+    .eq("id", id)
+    .select()
+    .single();
+  if (error) throw error;
+  return {
+    id: row.id,
+    author: row.author,
+    content: row.content,
+    createdAt: row.created_at,
+  };
+}
+
+export async function deletePrayerAnswer(id: string): Promise<void> {
+  const { error } = await supabase.from("prayer_answers").delete().eq("id", id);
+  if (error) throw error;
 }
 
 export async function addPrayerAnswer(

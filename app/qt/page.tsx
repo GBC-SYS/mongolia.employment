@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import type { CSSProperties } from "react";
 import ClientOnly from "@/components/ClientOnly";
+import BackButton from "@/components/BackButton";
 import QtDayTabs from "@/components/QtDayTabs";
 import QtContent from "@/components/QtContent";
 
@@ -17,8 +18,14 @@ export default function QtPage() {
   return (
     <div className="min-h-screen pb-20 lg:pb-0" style={glass}>
       <div className="px-5 pt-14 pb-6" style={{ borderBottom: "1px solid rgba(255, 255, 255, 0.95)" }}>
-        <h1 className="text-2xl font-bold text-gray-900">📖 매일 QT</h1>
-        <p className="text-sm mt-1 font-medium" style={{ color: brandDark }}>베드로전서 — 7일 묵상</p>
+        <div className="flex items-center gap-3">
+          <BackButton fallback="/" />
+          <div>
+            <p className="text-xs font-medium" style={{ color: brandDark }}>몽골 선교팀</p>
+            <h1 className="text-2xl font-bold text-gray-900">📖 매일 QT</h1>
+          </div>
+        </div>
+        <p className="text-sm mt-2 font-medium" style={{ color: brandDark }}>베드로전서 — 7일 묵상</p>
       </div>
 
       <ClientOnly>

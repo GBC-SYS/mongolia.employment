@@ -6,8 +6,13 @@ export async function GET(
   { params }: { params: Promise<{ letterId: string }> }
 ) {
   const { letterId } = await params;
-  const answers = await getPrayerAnswers(letterId);
-  return NextResponse.json(answers);
+  try {
+    const answers = await getPrayerAnswers(letterId);
+    return NextResponse.json(answers);
+  } catch (err) {
+    console.error("[prayer-answer GET]", err);
+    return NextResponse.json({ error: "서버 오류가 발생했습니다." }, { status: 500 });
+  }
 }
 
 export async function POST(
@@ -15,16 +20,26 @@ export async function POST(
   { params }: { params: Promise<{ letterId: string }> }
 ) {
   const { letterId } = await params;
-  const { author, content } = await req.json();
-
-  if (!content?.trim()) {
-    return NextResponse.json({ error: "내용을 입력해주세요" }, { status: 400 });
+  let body: { author?: unknown; content?: unknown };
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "잘못된 요청 형식입니다." }, { status: 400 });
   }
 
-  const answer = await addPrayerAnswer(letterId, {
-    author: author?.trim() || "익명",
-    content: content.trim(),
-  });
+  const content = String(body.content ?? "").trim();
+  if (!content) {
+    return NextResponse.json({ error: "내용을 입력해 주세요." }, { status: 400 });
+  }
 
-  return NextResponse.json(answer, { status: 201 });
+  try {
+    const answer = await addPrayerAnswer(letterId, {
+      author: String(body.author ?? "").trim() || "익명",
+      content,
+    });
+    return NextResponse.json(answer, { status: 201 });
+  } catch (err) {
+    console.error("[prayer-answer POST]", err);
+    return NextResponse.json({ error: "서버 오류가 발생했습니다." }, { status: 500 });
+  }
 }
