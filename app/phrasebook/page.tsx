@@ -78,17 +78,22 @@ function PhrasebookContent() {
     setOpenSections((prev) => ({ ...prev, [sectionKey]: true }));
 
     const audio = new Audio(SECTION_AUDIO[sectionKey]);
+    audio.playbackRate = 0.7;
     sectionAudioRef.current = audio;
     setPlayingSectionKey(sectionKey);
-    setPlayingSectionPhraseIdx(0);
+    setPlayingSectionPhraseIdx(-1);
 
     const startInterval = () => {
       if (sectionIntervalRef.current) return;
-      const phraseDuration = audio.duration / section.phrases.length;
+      // 인트로(한국어 설명) 약 1.5초 이후부터 몽골어 구문 시작
+      const introDuration = 1.5;
+      const phraseDuration = (audio.duration - introDuration) / section.phrases.length;
       sectionIntervalRef.current = setInterval(() => {
         if (!sectionAudioRef.current || sectionAudioRef.current.ended) return;
+        const elapsed = audio.currentTime - introDuration;
+        if (elapsed < 0) { setPlayingSectionPhraseIdx(-1); return; }
         const idx = Math.min(
-          Math.floor(audio.currentTime / phraseDuration),
+          Math.floor(elapsed / phraseDuration),
           section.phrases.length - 1
         );
         setPlayingSectionPhraseIdx(idx);
