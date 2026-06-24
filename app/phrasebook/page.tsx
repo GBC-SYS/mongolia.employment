@@ -72,6 +72,7 @@ function PhrasebookContent() {
 
     setPlayingSectionKey(sectionKey);
     const audio = new Audio(src);
+    audio.playbackRate = 0.7;
     sectionAudioRef.current = audio;
     audio.onended = () => {
       audio.onended = null;
