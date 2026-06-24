@@ -87,10 +87,12 @@ function PhrasebookContent() {
       if (sectionIntervalRef.current) return;
       // 인트로(한국어 설명) 약 2~3초 이후부터 몽골어 구문 시작
       const introDuration = 2.5;
+      // 하이라이트를 실제 소리보다 0.5초 앞당겨 체감 싱크 맞춤
+      const lookahead = 0.5;
       const phraseDuration = (audio.duration - introDuration) / section.phrases.length;
       sectionIntervalRef.current = setInterval(() => {
         if (!sectionAudioRef.current || sectionAudioRef.current.ended) return;
-        const elapsed = audio.currentTime - introDuration;
+        const elapsed = audio.currentTime - introDuration + lookahead;
         if (elapsed < 0) { setPlayingSectionPhraseIdx(-1); return; }
         const idx = Math.min(
           Math.floor(elapsed / phraseDuration),
