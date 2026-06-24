@@ -26,6 +26,8 @@ const SECTION_AUDIO: Record<string, string> = {
   vocab:      "/audio/phrasebook/section_vocab.mp3",
 };
 
+const INTER_PHRASE_GAP_MS = 600;
+
 function PhrasebookContent() {
   const [openSections, setOpenSections] = useAtom(phrasebookOpenSectionsAtom);
   const [playingKey, setPlayingKey] = useState<string | null>(null);
@@ -35,13 +37,22 @@ function PhrasebookContent() {
   const [playingSectionKey, setPlayingSectionKey] = useState<string | null>(null);
   const [playingSectionPhraseIdx, setPlayingSectionPhraseIdx] = useState<number>(-1);
   const sectionAudioRef = useRef<HTMLAudioElement | null>(null);
-  const sectionIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // 중단/언마운트 후 setTimeout 내 setState 차단용 flag
+  const cancelledRef = useRef(false);
+
+  // 활성 구문 카드 자동 스크롤
+  useEffect(() => {
+    if (playingSectionPhraseIdx < 0 || !playingSectionKey) return;
+    document
+      .getElementById(`phrase-card-${playingSectionKey}-${playingSectionPhraseIdx}`)
+      ?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, [playingSectionPhraseIdx, playingSectionKey]);
 
   // 언마운트 시 재생 중인 오디오·interval 정리
   useEffect(() => {
     return () => {
+      cancelledRef.current = true;
       if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
-      if (sectionIntervalRef.current) { clearInterval(sectionIntervalRef.current); sectionIntervalRef.current = null; }
       if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
       if (sectionAudioRef.current) { sectionAudioRef.current.pause(); sectionAudioRef.current = null; }
       if (typeof window !== "undefined") window.speechSynthesis?.cancel();
@@ -49,7 +60,7 @@ function PhrasebookContent() {
   }, []);
 
   const stopSectionAudio = () => {
-    if (sectionIntervalRef.current) { clearInterval(sectionIntervalRef.current); sectionIntervalRef.current = null; }
+    cancelledRef.current = true;
     sectionAudioRef.current?.pause();
     sectionAudioRef.current = null;
     setPlayingSectionKey(null);
@@ -66,6 +77,38 @@ function PhrasebookContent() {
     stopSectionAudio();
   };
 
+  const playPhraseChain = (sectionKey: string, phraseIdx: number) => {
+    if (cancelledRef.current) return;
+
+    const section = phrasebookData.find((s) => s.key === sectionKey);
+    if (!section) return;
+
+    if (phraseIdx >= section.phrases.length) {
+      stopSectionAudio();
+      return;
+    }
+
+    const phrase = section.phrases[phraseIdx];
+    if (!phrase.audio) {
+      playPhraseChain(sectionKey, phraseIdx + 1);
+      return;
+    }
+
+    setPlayingSectionPhraseIdx(phraseIdx);
+    const audio = new Audio(phrase.audio);
+    audio.playbackRate = 0.7;
+    sectionAudioRef.current = audio;
+    audio.onended = () => {
+      audio.onended = null; // 클로저 참조 해제 → GC 가능
+      setTimeout(() => {
+        if (!cancelledRef.current) {
+          playPhraseChain(sectionKey, phraseIdx + 1);
+        }
+      }, INTER_PHRASE_GAP_MS);
+    };
+    audio.play().catch(() => stopSectionAudio());
+  };
+
   const handleSectionAudio = (sectionKey: string) => {
     const wasPlaying = playingSectionKey === sectionKey;
     stopAll();
@@ -76,45 +119,37 @@ function PhrasebookContent() {
 
     // 아코디언 자동 열기 — 하이라이트가 보여야 의미 있음
     setOpenSections((prev) => ({ ...prev, [sectionKey]: true }));
-
-    const audio = new Audio(SECTION_AUDIO[sectionKey]);
-    audio.playbackRate = 0.7;
-    sectionAudioRef.current = audio;
     setPlayingSectionKey(sectionKey);
-    setPlayingSectionPhraseIdx(-1);
+    cancelledRef.current = false; // 새 재생 시작 시 flag 리셋
 
-    const startInterval = () => {
-      if (sectionIntervalRef.current) return;
-      // 인트로(한국어 설명) 약 5초 이후부터 몽골어 구문 시작
-      const introDuration = 5;
-      // 하이라이트를 실제 소리보다 0.5초 앞당겨 체감 싱크 맞춤
-      const lookahead = 0.5;
-      const phraseDuration = (audio.duration - introDuration) / section.phrases.length;
-      sectionIntervalRef.current = setInterval(() => {
-        if (!sectionAudioRef.current || sectionAudioRef.current.ended) return;
-        const elapsed = audio.currentTime - introDuration + lookahead;
-        if (elapsed < 0) { setPlayingSectionPhraseIdx(-1); return; }
-        const idx = Math.min(
-          Math.floor(elapsed / phraseDuration),
-          section.phrases.length - 1
-        );
-        setPlayingSectionPhraseIdx(idx);
-      }, 80);
-    };
+    const introDuration = section.introDuration ?? 0;
 
-    if (audio.readyState >= 1) {
-      startInterval();
+    if (introDuration > 0) {
+      // 한국어 인트로를 introDuration초까지만 재생 후 개별 구문 체인으로 전환
+      const introAudio = new Audio(SECTION_AUDIO[sectionKey]);
+      introAudio.playbackRate = 0.7;
+      sectionAudioRef.current = introAudio;
+
+      introAudio.ontimeupdate = () => {
+        if (introAudio.currentTime >= introDuration) {
+          introAudio.ontimeupdate = null;
+          introAudio.onended = null; // onended 중복 발화 방지
+          introAudio.pause();
+          sectionAudioRef.current = null;
+          // pause() 완료 후 마이크로태스크에서 실행 — iOS Safari 오디오 컨텍스트 충돌 방지
+          Promise.resolve().then(() => {
+            if (!cancelledRef.current) playPhraseChain(sectionKey, 0);
+          });
+        }
+      };
+      introAudio.onended = () => {
+        sectionAudioRef.current = null;
+        if (!cancelledRef.current) playPhraseChain(sectionKey, 0);
+      };
+      introAudio.play().catch(() => { setPlayingSectionKey(null); });
     } else {
-      audio.addEventListener("loadedmetadata", startInterval);
+      playPhraseChain(sectionKey, 0);
     }
-
-    audio.onended = () => {
-      if (sectionIntervalRef.current) { clearInterval(sectionIntervalRef.current); sectionIntervalRef.current = null; }
-      sectionAudioRef.current = null;
-      setPlayingSectionKey(null);
-      setPlayingSectionPhraseIdx(-1);
-    };
-    audio.play().catch(() => { setPlayingSectionKey(null); setPlayingSectionPhraseIdx(-1); });
   };
 
   const playAudio = (src: string, pron: string, key: string) => {
@@ -126,6 +161,7 @@ function PhrasebookContent() {
 
     const startInterval = () => {
       if (intervalRef.current) return;
+      if (!isFinite(audio.duration) || audio.duration === 0) return;
       const wordDuration = audio.duration / pronWords.length;
       intervalRef.current = setInterval(() => {
         const idx = Math.min(Math.floor(audio.currentTime / wordDuration), pronWords.length - 1);
@@ -137,7 +173,11 @@ function PhrasebookContent() {
     if (audio.readyState >= 1) {
       startInterval();
     } else {
-      audio.addEventListener("loadedmetadata", startInterval);
+      const handleMetadata = () => {
+        audio.removeEventListener("loadedmetadata", handleMetadata);
+        startInterval();
+      };
+      audio.addEventListener("loadedmetadata", handleMetadata);
     }
 
     audio.onended = () => {
@@ -210,7 +250,8 @@ function PhrasebookContent() {
                 const isActiveSectionPhrase = playingSectionKey === section.key && playingSectionPhraseIdx === i;
                 return (
                   <div
-                    key={i}
+                    id={`phrase-card-${section.key}-${i}`}
+                    key={`${section.key}_${i}`}
                     className="rounded-xl px-4 py-3 transition-[background,box-shadow] duration-150"
                     style={{
                       background: isActiveSectionPhrase

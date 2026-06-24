@@ -10,6 +10,7 @@ export interface PhrasebookSection {
   title: string;
   emoji: string;
   numbered?: boolean;
+  introDuration?: number; // 섹션 MP3 내 한국어 설명 길이(초) — 이후부터 개별 구문 체인 재생
   phrases: Phrase[];
 }
 
@@ -33,8 +34,9 @@ export const phrasebookData: PhrasebookSection[] = [
   },
   {
     key: "blessing",
-    title: "축복 & 사랑의 표현",
+    title: "축복과 사랑의 표현",
     emoji: "💚",
+    introDuration: 4.8,
     phrases: [
       { ko: "하나님은 당신을 사랑하십니다", mn: "Бурхан танд хайртай.", pron: "부르항 탄드 해르태", audio: "/audio/phrasebook/blessing_0.mp3" },
       { ko: "하나님의 축복이 있기를 바랍니다", mn: "Бурхан таныг ивээх болтугай.", pron: "부르항 타닉 이웨-흐 볼토개", audio: "/audio/phrasebook/blessing_1.mp3" },
@@ -47,6 +49,7 @@ export const phrasebookData: PhrasebookSection[] = [
     key: "confession",
     title: "신앙 고백 & 전도용 문장",
     emoji: "🙏",
+    introDuration: 5.2,
     phrases: [
       { ko: "예수님 믿으세요", mn: "Есүст итгээрэй.", pron: "예수쓰트 이트게레", audio: "/audio/phrasebook/confession_0.m4a" },
       { ko: "하나님은 살아계십니다", mn: "Бурхан амьд.", pron: "부르항 에미드", audio: "/audio/phrasebook/confession_1.m4a" },
@@ -60,9 +63,10 @@ export const phrasebookData: PhrasebookSection[] = [
   },
   {
     key: "gospel",
-    title: "복음 핵심 메시지",
+    title: "전도팀 복음용어",
     emoji: "✝️",
     numbered: true,
+    introDuration: 5.5,
     phrases: [
       {
         ko: "하나님은 세상을 만드시고 사람을 만드셨습니다.",
@@ -128,8 +132,9 @@ export const phrasebookData: PhrasebookSection[] = [
   },
   {
     key: "vocab",
-    title: "핵심 단어",
+    title: "주요 단어 설명",
     emoji: "📖",
+    introDuration: 3.0,
     phrases: [
       { ko: "하나님 / 신", mn: "Бурхан", pron: "부르항", audio: "/audio/phrasebook/vocab_god.mp3" },
       { ko: "천국", mn: "Диваажин", pron: "디와진", audio: "/audio/phrasebook/vocab_heaven.mp3" },
