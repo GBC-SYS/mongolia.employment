@@ -5,7 +5,7 @@ import { qtSelectedDayAtom, qtVerseOpenAtom } from "@/store/atoms";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { qtDays } from "@/data/qt-content";
 import type { QtDebriefing } from "@/lib/db";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import ConfirmDialog from "@/components/ConfirmDialog";
 
 function VerseBlock({ verses, passage }: { verses: string; passage: string }) {
@@ -81,26 +81,22 @@ function DebriefingForm({ day }: { day: number }) {
   const [saving, setSaving] = useState(false);
   const [confirmTarget, setConfirmTarget] = useState<string | null>(null);
 
-  const fetchEntries = useCallback(async (signal?: AbortSignal) => {
-    // setLoadingEntries(true)를 여기서 호출하지 않음
-    // → effect body에서 동기 setState 경고 방지
-    // 초기 로딩은 useState(true)가 처리하고, day 변경 시엔 key prop 리마운트가 리셋
-    try {
-      const res = await fetch(`/api/qt-debriefing?day=${day}`, { signal });
-      const data = await res.json();
-      setEntries(data.entries ?? []);
-    } catch (err) {
-      if ((err as Error).name !== "AbortError") setEntries([]);
-    } finally {
-      setLoadingEntries(false);
-    }
-  }, [day]);
-
   useEffect(() => {
     const controller = new AbortController();
-    fetchEntries(controller.signal);
+    async function load() {
+      try {
+        const res = await fetch(`/api/qt-debriefing?day=${day}`, { signal: controller.signal });
+        const data = await res.json();
+        setEntries(data.entries ?? []);
+      } catch (err) {
+        if ((err as Error).name !== "AbortError") setEntries([]);
+      } finally {
+        setLoadingEntries(false);
+      }
+    }
+    void load();
     return () => controller.abort();
-  }, [fetchEntries]);
+  }, [day]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -145,8 +141,9 @@ function DebriefingForm({ day }: { day: number }) {
         body: JSON.stringify({ grace: editGrace, improvement: editImprovement }),
       });
       if (!res.ok) throw new Error();
+      const { entry } = await res.json();
+      setEntries((prev) => prev.map((e) => (e.id === id ? entry : e)));
       setEditingId(null);
-      await fetchEntries();
     } catch {
       alert("수정 중 오류가 발생했습니다.");
     } finally {
