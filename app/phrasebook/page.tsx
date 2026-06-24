@@ -85,7 +85,7 @@ function PhrasebookContent() {
 
     const startInterval = () => {
       if (sectionIntervalRef.current) return;
-      // 인트로(한국어 설명) 약 1.5초 이후부터 몽골어 구문 시작
+      // 인트로(한국어 설명) 약 2~3초 이후부터 몽골어 구문 시작
       const introDuration = 2.5;
       const phraseDuration = (audio.duration - introDuration) / section.phrases.length;
       sectionIntervalRef.current = setInterval(() => {
