@@ -26,7 +26,6 @@ const SECTION_AUDIO: Record<string, string> = {
   vocab:      "/audio/phrasebook/section_vocab.mp3",
 };
 
-const INTER_PHRASE_GAP_MS = 600;
 
 function PhrasebookContent() {
   const [openSections, setOpenSections] = useAtom(phrasebookOpenSectionsAtom);
@@ -35,23 +34,11 @@ function PhrasebookContent() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [playingSectionKey, setPlayingSectionKey] = useState<string | null>(null);
-  const [playingSectionPhraseIdx, setPlayingSectionPhraseIdx] = useState<number>(-1);
   const sectionAudioRef = useRef<HTMLAudioElement | null>(null);
-  // 중단/언마운트 후 setTimeout 내 setState 차단용 flag
-  const cancelledRef = useRef(false);
-
-  // 활성 구문 카드 자동 스크롤
-  useEffect(() => {
-    if (playingSectionPhraseIdx < 0 || !playingSectionKey) return;
-    document
-      .getElementById(`phrase-card-${playingSectionKey}-${playingSectionPhraseIdx}`)
-      ?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-  }, [playingSectionPhraseIdx, playingSectionKey]);
 
   // 언마운트 시 재생 중인 오디오·interval 정리
   useEffect(() => {
     return () => {
-      cancelledRef.current = true;
       if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
       if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
       if (sectionAudioRef.current) { sectionAudioRef.current.pause(); sectionAudioRef.current = null; }
@@ -60,11 +47,9 @@ function PhrasebookContent() {
   }, []);
 
   const stopSectionAudio = () => {
-    cancelledRef.current = true;
     sectionAudioRef.current?.pause();
     sectionAudioRef.current = null;
     setPlayingSectionKey(null);
-    setPlayingSectionPhraseIdx(-1);
   };
 
   const stopAll = () => {
@@ -77,79 +62,22 @@ function PhrasebookContent() {
     stopSectionAudio();
   };
 
-  const playPhraseChain = (sectionKey: string, phraseIdx: number) => {
-    if (cancelledRef.current) return;
-
-    const section = phrasebookData.find((s) => s.key === sectionKey);
-    if (!section) return;
-
-    if (phraseIdx >= section.phrases.length) {
-      stopSectionAudio();
-      return;
-    }
-
-    const phrase = section.phrases[phraseIdx];
-    if (!phrase.audio) {
-      playPhraseChain(sectionKey, phraseIdx + 1);
-      return;
-    }
-
-    setPlayingSectionPhraseIdx(phraseIdx);
-    const audio = new Audio(phrase.audio);
-    audio.playbackRate = 0.7;
-    sectionAudioRef.current = audio;
-    audio.onended = () => {
-      audio.onended = null; // 클로저 참조 해제 → GC 가능
-      setTimeout(() => {
-        if (!cancelledRef.current) {
-          playPhraseChain(sectionKey, phraseIdx + 1);
-        }
-      }, INTER_PHRASE_GAP_MS);
-    };
-    audio.play().catch(() => stopSectionAudio());
-  };
-
   const handleSectionAudio = (sectionKey: string) => {
     const wasPlaying = playingSectionKey === sectionKey;
     stopAll();
     if (wasPlaying) return;
 
-    const section = phrasebookData.find((s) => s.key === sectionKey);
-    if (!section) return;
+    const src = SECTION_AUDIO[sectionKey];
+    if (!src) return;
 
-    // 아코디언 자동 열기 — 하이라이트가 보여야 의미 있음
-    setOpenSections((prev) => ({ ...prev, [sectionKey]: true }));
     setPlayingSectionKey(sectionKey);
-    cancelledRef.current = false; // 새 재생 시작 시 flag 리셋
-
-    const introDuration = section.introDuration ?? 0;
-
-    if (introDuration > 0) {
-      // 한국어 인트로를 introDuration초까지만 재생 후 개별 구문 체인으로 전환
-      const introAudio = new Audio(SECTION_AUDIO[sectionKey]);
-      introAudio.playbackRate = 0.7;
-      sectionAudioRef.current = introAudio;
-
-      introAudio.ontimeupdate = () => {
-        if (introAudio.currentTime >= introDuration) {
-          introAudio.ontimeupdate = null;
-          introAudio.onended = null; // onended 중복 발화 방지
-          introAudio.pause();
-          sectionAudioRef.current = null;
-          // pause() 완료 후 마이크로태스크에서 실행 — iOS Safari 오디오 컨텍스트 충돌 방지
-          Promise.resolve().then(() => {
-            if (!cancelledRef.current) playPhraseChain(sectionKey, 0);
-          });
-        }
-      };
-      introAudio.onended = () => {
-        sectionAudioRef.current = null;
-        if (!cancelledRef.current) playPhraseChain(sectionKey, 0);
-      };
-      introAudio.play().catch(() => { setPlayingSectionKey(null); });
-    } else {
-      playPhraseChain(sectionKey, 0);
-    }
+    const audio = new Audio(src);
+    sectionAudioRef.current = audio;
+    audio.onended = () => {
+      audio.onended = null;
+      stopSectionAudio();
+    };
+    audio.play().catch(() => stopSectionAudio());
   };
 
   const playAudio = (src: string, pron: string, key: string) => {
@@ -247,18 +175,11 @@ function PhrasebookContent() {
               {section.phrases.map((phrase, i) => {
                 const audioKey = `${section.key}_${i}`;
                 const isPlaying = playingKey === audioKey;
-                const isActiveSectionPhrase = playingSectionKey === section.key && playingSectionPhraseIdx === i;
                 return (
                   <div
-                    id={`phrase-card-${section.key}-${i}`}
                     key={`${section.key}_${i}`}
-                    className="rounded-xl px-4 py-3 transition-[background,box-shadow] duration-150"
-                    style={{
-                      background: isActiveSectionPhrase
-                        ? "linear-gradient(120deg, #bbf7d0 0%, #86efac 100%)"
-                        : "rgba(255,255,255,0.65)",
-                      boxShadow: isActiveSectionPhrase ? "0 0 0 2px #86efac" : undefined,
-                    }}
+                    className="rounded-xl px-4 py-3 transition-[background] duration-150"
+                    style={{ background: "rgba(255,255,255,0.65)" }}
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
