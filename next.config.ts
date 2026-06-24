@@ -51,6 +51,11 @@ const withSerwist = withSerwistInit({
     { url: "/audio/phrasebook/vocab_heaven.mp3", revision: BUILD_REVISION },
     { url: "/audio/phrasebook/vocab_savior.mp3", revision: BUILD_REVISION },
     { url: "/audio/phrasebook/vocab_sin.mp3", revision: BUILD_REVISION },
+    // 섹션 전체 재생 오디오 (4개)
+    { url: "/audio/phrasebook/section_blessing.mp3", revision: BUILD_REVISION },
+    { url: "/audio/phrasebook/section_confession.mp3", revision: BUILD_REVISION },
+    { url: "/audio/phrasebook/section_gospel.mp3", revision: BUILD_REVISION },
+    { url: "/audio/phrasebook/section_vocab.mp3", revision: BUILD_REVISION },
   ],
 });
 
