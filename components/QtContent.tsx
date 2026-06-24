@@ -82,7 +82,9 @@ function DebriefingForm({ day }: { day: number }) {
   const [confirmTarget, setConfirmTarget] = useState<string | null>(null);
 
   const fetchEntries = useCallback(async (signal?: AbortSignal) => {
-    setLoadingEntries(true);
+    // setLoadingEntries(true)를 여기서 호출하지 않음
+    // → effect body에서 동기 setState 경고 방지
+    // 초기 로딩은 useState(true)가 처리하고, day 변경 시엔 key prop 리마운트가 리셋
     try {
       const res = await fetch(`/api/qt-debriefing?day=${day}`, { signal });
       const data = await res.json();
@@ -445,7 +447,7 @@ export default function QtContent() {
         </div>
       </div>
 
-      <DebriefingForm day={selectedDay} />
+      <DebriefingForm key={selectedDay} day={selectedDay} />
     </div>
   );
 }
