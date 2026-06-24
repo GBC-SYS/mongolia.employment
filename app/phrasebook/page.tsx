@@ -33,12 +33,15 @@ function PhrasebookContent() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [playingSectionKey, setPlayingSectionKey] = useState<string | null>(null);
+  const [playingSectionPhraseIdx, setPlayingSectionPhraseIdx] = useState<number>(-1);
   const sectionAudioRef = useRef<HTMLAudioElement | null>(null);
+  const sectionIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // 언마운트 시 재생 중인 오디오·interval 정리
   useEffect(() => {
     return () => {
       if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
+      if (sectionIntervalRef.current) { clearInterval(sectionIntervalRef.current); sectionIntervalRef.current = null; }
       if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
       if (sectionAudioRef.current) { sectionAudioRef.current.pause(); sectionAudioRef.current = null; }
       if (typeof window !== "undefined") window.speechSynthesis?.cancel();
@@ -46,9 +49,11 @@ function PhrasebookContent() {
   }, []);
 
   const stopSectionAudio = () => {
+    if (sectionIntervalRef.current) { clearInterval(sectionIntervalRef.current); sectionIntervalRef.current = null; }
     sectionAudioRef.current?.pause();
     sectionAudioRef.current = null;
     setPlayingSectionKey(null);
+    setPlayingSectionPhraseIdx(-1);
   };
 
   const stopAll = () => {
@@ -66,11 +71,43 @@ function PhrasebookContent() {
     stopAll();
     if (wasPlaying) return;
 
+    const section = phrasebookData.find((s) => s.key === sectionKey);
+    if (!section) return;
+
+    // 아코디언 자동 열기 — 하이라이트가 보여야 의미 있음
+    setOpenSections((prev) => ({ ...prev, [sectionKey]: true }));
+
     const audio = new Audio(SECTION_AUDIO[sectionKey]);
     sectionAudioRef.current = audio;
     setPlayingSectionKey(sectionKey);
-    audio.onended = () => { sectionAudioRef.current = null; setPlayingSectionKey(null); };
-    audio.play().catch(() => setPlayingSectionKey(null));
+    setPlayingSectionPhraseIdx(0);
+
+    const startInterval = () => {
+      if (sectionIntervalRef.current) return;
+      const phraseDuration = audio.duration / section.phrases.length;
+      sectionIntervalRef.current = setInterval(() => {
+        if (!sectionAudioRef.current || sectionAudioRef.current.ended) return;
+        const idx = Math.min(
+          Math.floor(audio.currentTime / phraseDuration),
+          section.phrases.length - 1
+        );
+        setPlayingSectionPhraseIdx(idx);
+      }, 80);
+    };
+
+    if (audio.readyState >= 1) {
+      startInterval();
+    } else {
+      audio.addEventListener("loadedmetadata", startInterval);
+    }
+
+    audio.onended = () => {
+      if (sectionIntervalRef.current) { clearInterval(sectionIntervalRef.current); sectionIntervalRef.current = null; }
+      sectionAudioRef.current = null;
+      setPlayingSectionKey(null);
+      setPlayingSectionPhraseIdx(-1);
+    };
+    audio.play().catch(() => { setPlayingSectionKey(null); setPlayingSectionPhraseIdx(-1); });
   };
 
   const playAudio = (src: string, pron: string, key: string) => {
@@ -163,11 +200,17 @@ function PhrasebookContent() {
               {section.phrases.map((phrase, i) => {
                 const audioKey = `${section.key}_${i}`;
                 const isPlaying = playingKey === audioKey;
+                const isActiveSectionPhrase = playingSectionKey === section.key && playingSectionPhraseIdx === i;
                 return (
                   <div
                     key={i}
-                    className="rounded-xl px-4 py-3"
-                    style={{ background: "rgba(255,255,255,0.65)" }}
+                    className="rounded-xl px-4 py-3 transition-[background,box-shadow] duration-150"
+                    style={{
+                      background: isActiveSectionPhrase
+                        ? "linear-gradient(120deg, #bbf7d0 0%, #86efac 100%)"
+                        : "rgba(255,255,255,0.65)",
+                      boxShadow: isActiveSectionPhrase ? "0 0 0 2px #86efac" : undefined,
+                    }}
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
