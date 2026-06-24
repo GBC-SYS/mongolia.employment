@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { type PrayerAnswer } from "@/lib/db";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
 const PA_IDS_KEY = "mongol-pa-ids";
 
@@ -32,6 +33,7 @@ export default function PrayerAnswerSection({ letterId }: { letterId: string }) 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
   const [saving, setSaving] = useState(false);
+  const [confirmTarget, setConfirmTarget] = useState<string | null>(null);
 
   useEffect(() => {
     setMyIds(loadMyIds());
@@ -95,7 +97,13 @@ export default function PrayerAnswerSection({ letterId }: { letterId: string }) 
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("⚠️ 주의: 이 기도응답은 복구할 수 없습니다.\n\n다른 팀원의 기록일 수 있습니다. 정말 삭제하시겠습니까?")) return;
+    setConfirmTarget(id);
+  }
+
+  async function confirmDelete() {
+    if (!confirmTarget) return;
+    const id = confirmTarget;
+    setConfirmTarget(null);
     try {
       const res = await fetch(`/api/prayer-answer/item/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error();
@@ -110,6 +118,14 @@ export default function PrayerAnswerSection({ letterId }: { letterId: string }) 
   }
 
   return (
+    <>
+    <ConfirmDialog
+      open={confirmTarget !== null}
+      title="이 기도응답을 삭제하시겠습니까?"
+      message="삭제된 기록은 복구할 수 없습니다. 다른 팀원의 기록일 수 있으니 신중하게 결정해 주세요."
+      onConfirm={confirmDelete}
+      onCancel={() => setConfirmTarget(null)}
+    />
     <div className="px-4 pt-2 pb-6">
       <div className="flex items-center gap-2 mb-3">
         <div className="h-px flex-1 bg-black/10" />
@@ -233,5 +249,6 @@ export default function PrayerAnswerSection({ letterId }: { letterId: string }) 
         </div>
       )}
     </div>
+    </>
   );
 }

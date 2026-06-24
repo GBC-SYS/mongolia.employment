@@ -6,6 +6,7 @@ import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { qtDays } from "@/data/qt-content";
 import type { QtDebriefing } from "@/lib/db";
 import { useState, useEffect, useCallback } from "react";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
 function VerseBlock({ verses, passage }: { verses: string; passage: string }) {
   const [open, setOpen] = useAtom(qtVerseOpenAtom);
@@ -75,6 +76,7 @@ function DebriefingForm({ day }: { day: number }) {
   const [editGrace, setEditGrace] = useState("");
   const [editImprovement, setEditImprovement] = useState("");
   const [saving, setSaving] = useState(false);
+  const [confirmTarget, setConfirmTarget] = useState<string | null>(null);
 
   useEffect(() => {
     setMyIds(loadMyIds());
@@ -152,7 +154,13 @@ function DebriefingForm({ day }: { day: number }) {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("⚠️ 주의: 이 디브리핑은 복구할 수 없습니다.\n\n다른 팀원의 기록일 수 있습니다. 정말 삭제하시겠습니까?")) return;
+    setConfirmTarget(id);
+  }
+
+  async function confirmDelete() {
+    if (!confirmTarget) return;
+    const id = confirmTarget;
+    setConfirmTarget(null);
     try {
       const res = await fetch(`/api/qt-debriefing/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error();
@@ -167,6 +175,14 @@ function DebriefingForm({ day }: { day: number }) {
   }
 
   return (
+    <>
+    <ConfirmDialog
+      open={confirmTarget !== null}
+      title="이 디브리핑을 삭제하시겠습니까?"
+      message="삭제된 기록은 복구할 수 없습니다. 다른 팀원의 기록일 수 있으니 신중하게 결정해 주세요."
+      onConfirm={confirmDelete}
+      onCancel={() => setConfirmTarget(null)}
+    />
     <div className="space-y-4">
       <div
         className="rounded-2xl p-4"
@@ -364,6 +380,7 @@ function DebriefingForm({ day }: { day: number }) {
         </div>
       ) : null}
     </div>
+    </>
   );
 }
 
