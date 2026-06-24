@@ -262,13 +262,13 @@ function DebriefingForm({ day }: { day: number }) {
                       <>
                         <button
                           onClick={() => startEdit(entry)}
-                          className="text-[10px] text-blue-500 font-medium active:opacity-60 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                          className="text-[10px] text-blue-500 font-medium active:opacity-60 min-h-[44px] px-2 flex items-center"
                         >
                           수정
                         </button>
                         <button
                           onClick={() => handleDelete(entry.id)}
-                          className="text-[10px] text-red-400 font-medium active:opacity-60 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                          className="text-[10px] text-red-400 font-medium active:opacity-60 min-h-[44px] px-2 flex items-center"
                         >
                           삭제
                         </button>
