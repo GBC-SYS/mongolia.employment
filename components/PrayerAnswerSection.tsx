@@ -95,7 +95,7 @@ export default function PrayerAnswerSection({ letterId }: { letterId: string }) 
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("이 기도응답을 삭제할까요?")) return;
+    if (!confirm("⚠️ 주의: 이 기도응답은 복구할 수 없습니다.\n\n다른 팀원의 기록일 수 있습니다. 정말 삭제하시겠습니까?")) return;
     try {
       const res = await fetch(`/api/prayer-answer/item/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error();
