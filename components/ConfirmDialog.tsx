@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import React, { useEffect, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 
 interface ConfirmDialogProps {
@@ -20,12 +20,9 @@ export default function ConfirmDialog({
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
-  const [mounted, setMounted] = useState(false);
-
-  // useLayoutEffect: DOM 준비 여부를 확인하는 목적 → 페인트 전 동기 실행으로 cascade 경고 없음
-  useLayoutEffect(() => {
-    setMounted(true);
-  }, []);
+  // useSyncExternalStore: setState 없이 서버(false)/클라이언트(true) 분기
+  // 서버 렌더링 시 getServerSnapshot → false, 클라이언트 hydration 후 getSnapshot → true
+  const mounted = useSyncExternalStore(() => () => {}, () => true, () => false);
 
   // ESC 키로 다이얼로그 닫기 (접근성 + UX)
   useEffect(() => {
