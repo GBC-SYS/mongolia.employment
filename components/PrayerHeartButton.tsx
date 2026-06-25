@@ -7,6 +7,10 @@ const STORAGE_KEY = "prayer_heart_clicked";
 
 export default function PrayerHeartButton() {
   const [count, setCount] = useState<number | null>(null);
+  const [clicked, setClicked] = useState(() => {
+    try { return localStorage.getItem(STORAGE_KEY) === "true"; } catch { return false; }
+  });
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetch("/api/prayer-count")
@@ -14,12 +18,6 @@ export default function PrayerHeartButton() {
       .then((d) => setCount(d.count))
       .catch(() => setCount(0));
   }, []);
-  const [clicked, setClicked] = useState(false);
-
-  useEffect(() => {
-    try { setClicked(localStorage.getItem(STORAGE_KEY) === "true"); } catch {}
-  }, []);
-  const [loading, setLoading] = useState(false);
 
   const handleClick = async () => {
     if (clicked || loading) return;

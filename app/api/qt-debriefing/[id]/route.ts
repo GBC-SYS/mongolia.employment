@@ -5,6 +5,12 @@ type Params = { params: Promise<{ id: string }> };
 
 export async function PUT(req: NextRequest, { params }: Params) {
   const { id } = await params;
+
+  const editToken = req.headers.get("X-Edit-Token") ?? "";
+  if (!editToken) {
+    return NextResponse.json({ error: "수정 권한이 없습니다." }, { status: 403 });
+  }
+
   let body: { grace?: unknown; improvement?: unknown };
   try {
     body = await req.json();
@@ -20,20 +26,32 @@ export async function PUT(req: NextRequest, { params }: Params) {
   }
 
   try {
-    const entry = await updateQtDebriefing(id, { grace, improvement });
+    const entry = await updateQtDebriefing(id, { grace, improvement }, editToken);
     return NextResponse.json({ entry });
   } catch (err) {
+    if (err instanceof Error && err.message === "권한이 없습니다.") {
+      return NextResponse.json({ error: "수정 권한이 없습니다." }, { status: 403 });
+    }
     console.error("[qt-debriefing PUT]", err);
     return NextResponse.json({ error: "서버 오류가 발생했습니다." }, { status: 500 });
   }
 }
 
-export async function DELETE(_req: NextRequest, { params }: Params) {
+export async function DELETE(req: NextRequest, { params }: Params) {
   const { id } = await params;
+
+  const editToken = req.headers.get("X-Edit-Token") ?? "";
+  if (!editToken) {
+    return NextResponse.json({ error: "삭제 권한이 없습니다." }, { status: 403 });
+  }
+
   try {
-    await deleteQtDebriefing(id);
+    await deleteQtDebriefing(id, editToken);
     return NextResponse.json({ ok: true });
   } catch (err) {
+    if (err instanceof Error && err.message === "권한이 없습니다.") {
+      return NextResponse.json({ error: "삭제 권한이 없습니다." }, { status: 403 });
+    }
     console.error("[qt-debriefing DELETE]", err);
     return NextResponse.json({ error: "서버 오류가 발생했습니다." }, { status: 500 });
   }

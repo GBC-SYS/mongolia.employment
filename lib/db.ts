@@ -11,6 +11,7 @@ export interface QtDebriefing {
   grace: string;
   improvement: string;
   createdAt: string;
+  editToken?: string; // POST 응답 시에만 포함, 이후 요청에서는 미포함
 }
 
 export interface PrayerAnswer {
@@ -18,6 +19,7 @@ export interface PrayerAnswer {
   author: string;
   content: string;
   createdAt: string;
+  editToken?: string; // POST 응답 시에만 포함, 이후 요청에서는 미포함
 }
 
 export async function getPrayerCount(): Promise<number> {
@@ -55,9 +57,10 @@ export async function addQtDebriefing(
   day: number,
   data: { author: string; grace: string; improvement: string }
 ): Promise<QtDebriefing> {
+  const editToken = crypto.randomUUID();
   const { data: row, error } = await supabase
     .from("qt_debriefings")
-    .insert({ day, author: data.author || "익명", grace: data.grace, improvement: data.improvement })
+    .insert({ day, author: data.author || "익명", grace: data.grace, improvement: data.improvement, edit_token: editToken })
     .select()
     .single();
   if (error) throw error;
@@ -67,12 +70,14 @@ export async function addQtDebriefing(
     grace: row.grace,
     improvement: row.improvement,
     createdAt: row.created_at,
+    editToken, // 클라이언트에 1회만 전달
   };
 }
 
 export async function updateQtDebriefing(
   id: string,
-  data: { grace?: string; improvement?: string }
+  data: { grace?: string; improvement?: string },
+  editToken: string
 ): Promise<QtDebriefing> {
   const updates: Record<string, string> = {};
   if (data.grace !== undefined) updates.grace = data.grace;
@@ -81,9 +86,13 @@ export async function updateQtDebriefing(
     .from("qt_debriefings")
     .update(updates)
     .eq("id", id)
+    .eq("edit_token", editToken)
     .select()
     .single();
-  if (error) throw error;
+  if (error) {
+    if (error.code === "PGRST116") throw new Error("권한이 없습니다.");
+    throw error;
+  }
   return {
     id: row.id,
     author: row.author,
@@ -93,7 +102,14 @@ export async function updateQtDebriefing(
   };
 }
 
-export async function deleteQtDebriefing(id: string): Promise<void> {
+export async function deleteQtDebriefing(id: string, editToken: string): Promise<void> {
+  const { data: check } = await supabase
+    .from("qt_debriefings")
+    .select("id")
+    .eq("id", id)
+    .eq("edit_token", editToken)
+    .maybeSingle();
+  if (!check) throw new Error("권한이 없습니다.");
   const { error } = await supabase.from("qt_debriefings").delete().eq("id", id);
   if (error) throw error;
 }
@@ -115,15 +131,20 @@ export async function getPrayerAnswers(letterId: string): Promise<PrayerAnswer[]
 
 export async function updatePrayerAnswer(
   id: string,
-  data: { content: string }
+  data: { content: string },
+  editToken: string
 ): Promise<PrayerAnswer> {
   const { data: row, error } = await supabase
     .from("prayer_answers")
     .update({ content: data.content })
     .eq("id", id)
+    .eq("edit_token", editToken)
     .select()
     .single();
-  if (error) throw error;
+  if (error) {
+    if (error.code === "PGRST116") throw new Error("권한이 없습니다.");
+    throw error;
+  }
   return {
     id: row.id,
     author: row.author,
@@ -132,7 +153,14 @@ export async function updatePrayerAnswer(
   };
 }
 
-export async function deletePrayerAnswer(id: string): Promise<void> {
+export async function deletePrayerAnswer(id: string, editToken: string): Promise<void> {
+  const { data: check } = await supabase
+    .from("prayer_answers")
+    .select("id")
+    .eq("id", id)
+    .eq("edit_token", editToken)
+    .maybeSingle();
+  if (!check) throw new Error("권한이 없습니다.");
   const { error } = await supabase.from("prayer_answers").delete().eq("id", id);
   if (error) throw error;
 }
@@ -141,9 +169,10 @@ export async function addPrayerAnswer(
   letterId: string,
   data: { author: string; content: string }
 ): Promise<PrayerAnswer> {
+  const editToken = crypto.randomUUID();
   const { data: row, error } = await supabase
     .from("prayer_answers")
-    .insert({ letter_id: letterId, author: data.author || "익명", content: data.content })
+    .insert({ letter_id: letterId, author: data.author || "익명", content: data.content, edit_token: editToken })
     .select()
     .single();
   if (error) throw error;
@@ -152,5 +181,6 @@ export async function addPrayerAnswer(
     author: row.author,
     content: row.content,
     createdAt: row.created_at,
+    editToken, // 클라이언트에 1회만 전달
   };
 }

@@ -45,20 +45,20 @@ function VerseBlock({ verses, passage }: { verses: string; passage: string }) {
   );
 }
 
-const QT_IDS_KEY = "mongol-qt-ids";
+const QT_TOKENS_KEY = "mongol-qt-tokens";
 
-function loadMyIds(): Set<string> {
+function loadMyTokens(): Record<string, string> {
   try {
-    const raw = localStorage.getItem(QT_IDS_KEY);
-    return new Set(raw ? JSON.parse(raw) : []);
+    const raw = localStorage.getItem(QT_TOKENS_KEY);
+    return raw ? JSON.parse(raw) : {};
   } catch {
-    return new Set();
+    return {};
   }
 }
 
-function saveMyIds(ids: Set<string>) {
+function saveMyTokens(tokens: Record<string, string>) {
   try {
-    localStorage.setItem(QT_IDS_KEY, JSON.stringify([...ids]));
+    localStorage.setItem(QT_TOKENS_KEY, JSON.stringify(tokens));
   } catch {
     // Private Mode
   }
@@ -72,8 +72,8 @@ function DebriefingForm({ day }: { day: number }) {
   const [entries, setEntries] = useState<QtDebriefing[]>([]);
   const [loadingEntries, setLoadingEntries] = useState(true);
   // lazy initializer: 렌더 시점에 localStorage를 직접 읽어 초기값 계산 → effect 불필요
-  const [myIds, setMyIds] = useState<Set<string>>(() =>
-    typeof window === "undefined" ? new Set() : loadMyIds()
+  const [myTokens, setMyTokens] = useState<Record<string, string>>(() =>
+    typeof window === "undefined" ? {} : loadMyTokens()
   );
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editGrace, setEditGrace] = useState("");
@@ -110,10 +110,9 @@ function DebriefingForm({ day }: { day: number }) {
       });
       if (!res.ok) throw new Error();
       const { entry } = await res.json();
-      const updated = new Set(myIds);
-      updated.add(entry.id);
-      setMyIds(updated);
-      saveMyIds(updated);
+      const updated = { ...myTokens, [entry.id]: entry.editToken ?? "" };
+      setMyTokens(updated);
+      saveMyTokens(updated);
       setAuthor("");
       setGrace("");
       setImprovement("");
@@ -137,7 +136,7 @@ function DebriefingForm({ day }: { day: number }) {
     try {
       const res = await fetch(`/api/qt-debriefing/${id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "X-Edit-Token": myTokens[id] ?? "" },
         body: JSON.stringify({ grace: editGrace, improvement: editImprovement }),
       });
       if (!res.ok) throw new Error();
@@ -160,12 +159,14 @@ function DebriefingForm({ day }: { day: number }) {
     const id = confirmTarget;
     setConfirmTarget(null);
     try {
-      const res = await fetch(`/api/qt-debriefing/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/qt-debriefing/${id}`, {
+        method: "DELETE",
+        headers: { "X-Edit-Token": myTokens[id] ?? "" },
+      });
       if (!res.ok) throw new Error();
-      const updated = new Set(myIds);
-      updated.delete(id);
-      setMyIds(updated);
-      saveMyIds(updated);
+      const { [id]: _, ...updated } = myTokens;
+      setMyTokens(updated);
+      saveMyTokens(updated);
       setEntries((prev) => prev.filter((e) => e.id !== id));
     } catch {
       alert("삭제 중 오류가 발생했습니다.");
@@ -246,7 +247,7 @@ function DebriefingForm({ day }: { day: number }) {
         <div className="space-y-2">
           <p className="text-xs font-semibold text-gray-700 px-1">팀원들의 디브리핑</p>
           {entries.map((entry) => {
-            const isMine = myIds.has(entry.id);
+            const isMine = !!myTokens[entry.id];
             const isEditing = editingId === entry.id;
             return (
               <div

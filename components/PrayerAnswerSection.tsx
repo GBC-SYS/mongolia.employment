@@ -4,20 +4,20 @@ import { useState, useEffect } from "react";
 import { type PrayerAnswer } from "@/lib/db";
 import ConfirmDialog from "@/components/ConfirmDialog";
 
-const PA_IDS_KEY = "mongol-pa-ids";
+const PA_TOKENS_KEY = "mongol-pa-tokens";
 
-function loadMyIds(): Set<string> {
+function loadMyTokens(): Record<string, string> {
   try {
-    const raw = localStorage.getItem(PA_IDS_KEY);
-    return new Set(raw ? JSON.parse(raw) : []);
+    const raw = localStorage.getItem(PA_TOKENS_KEY);
+    return raw ? JSON.parse(raw) : {};
   } catch {
-    return new Set();
+    return {};
   }
 }
 
-function saveMyIds(ids: Set<string>) {
+function saveMyTokens(tokens: Record<string, string>) {
   try {
-    localStorage.setItem(PA_IDS_KEY, JSON.stringify([...ids]));
+    localStorage.setItem(PA_TOKENS_KEY, JSON.stringify(tokens));
   } catch {
     // Private Mode
   }
@@ -30,8 +30,8 @@ export default function PrayerAnswerSection({ letterId }: { letterId: string }) 
   const [fetching, setFetching] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   // lazy initializer: 렌더 시점에 localStorage를 직접 읽어 초기값 계산 → effect 불필요
-  const [myIds, setMyIds] = useState<Set<string>>(() =>
-    typeof window === "undefined" ? new Set() : loadMyIds()
+  const [myTokens, setMyTokens] = useState<Record<string, string>>(() =>
+    typeof window === "undefined" ? {} : loadMyTokens()
   );
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
@@ -63,10 +63,9 @@ export default function PrayerAnswerSection({ letterId }: { letterId: string }) 
       if (res.ok) {
         const newAnswer: PrayerAnswer = await res.json();
         setAnswers((prev) => [newAnswer, ...prev]);
-        const updated = new Set(myIds);
-        updated.add(newAnswer.id);
-        setMyIds(updated);
-        saveMyIds(updated);
+        const updated = { ...myTokens, [newAnswer.id]: newAnswer.editToken ?? "" };
+        setMyTokens(updated);
+        saveMyTokens(updated);
         setContent("");
         setAuthor("");
       }
@@ -81,7 +80,7 @@ export default function PrayerAnswerSection({ letterId }: { letterId: string }) 
     try {
       const res = await fetch(`/api/prayer-answer/item/${id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "X-Edit-Token": myTokens[id] ?? "" },
         body: JSON.stringify({ content: editContent }),
       });
       if (!res.ok) throw new Error();
@@ -104,12 +103,14 @@ export default function PrayerAnswerSection({ letterId }: { letterId: string }) 
     const id = confirmTarget;
     setConfirmTarget(null);
     try {
-      const res = await fetch(`/api/prayer-answer/item/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/prayer-answer/item/${id}`, {
+        method: "DELETE",
+        headers: { "X-Edit-Token": myTokens[id] ?? "" },
+      });
       if (!res.ok) throw new Error();
-      const updated = new Set(myIds);
-      updated.delete(id);
-      setMyIds(updated);
-      saveMyIds(updated);
+      const { [id]: _, ...updated } = myTokens;
+      setMyTokens(updated);
+      saveMyTokens(updated);
       setAnswers((prev) => prev.filter((a) => a.id !== id));
     } catch {
       alert("삭제 중 오류가 발생했습니다.");
@@ -170,7 +171,7 @@ export default function PrayerAnswerSection({ letterId }: { letterId: string }) 
       ) : (
         <div className="space-y-3">
           {answers.map((a) => {
-            const isMine = myIds.has(a.id);
+            const isMine = !!myTokens[a.id];
             const isEditing = editingId === a.id;
             return (
               <div
