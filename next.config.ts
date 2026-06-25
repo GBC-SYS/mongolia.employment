@@ -26,9 +26,10 @@ const withSerwist = withSerwistInit({
       url: `/prayer-letters/${String(i + 1).padStart(3, "0")}`,
       revision: BUILD_REVISION,
     })),
-    // 전도 구문집 오디오 — blessing (6개)
-    ...Array.from({ length: 6 }, (_, i) => ({
-      url: `/audio/phrasebook/blessing_${i}.mp3`,
+    // 전도 구문집 오디오 — blessing (blessing_0은 m4a, 나머지는 mp3)
+    { url: "/audio/phrasebook/blessing_0.m4a", revision: BUILD_REVISION },
+    ...Array.from({ length: 5 }, (_, i) => ({
+      url: `/audio/phrasebook/blessing_${i + 1}.mp3`,
       revision: BUILD_REVISION,
     })),
     // gospel (10개)
@@ -36,26 +37,19 @@ const withSerwist = withSerwistInit({
       url: `/audio/phrasebook/gospel_${i}.mp3`,
       revision: BUILD_REVISION,
     })),
-    // confession m4a (3개)
-    { url: "/audio/phrasebook/confession_0.m4a", revision: BUILD_REVISION },
-    { url: "/audio/phrasebook/confession_1.m4a", revision: BUILD_REVISION },
-    { url: "/audio/phrasebook/confession_2.m4a", revision: BUILD_REVISION },
-    // confession mp3 (4개) — confession_3은 존재하지 않음 (파일 미생성, 의도적 누락)
+    // confession mp3 (6개) — confession_3은 존재하지 않음 (파일 미생성, 의도적 누락)
+    { url: "/audio/phrasebook/confession_0.mp3", revision: BUILD_REVISION },
+    { url: "/audio/phrasebook/confession_1.mp3", revision: BUILD_REVISION },
+    { url: "/audio/phrasebook/confession_2.mp3", revision: BUILD_REVISION },
     { url: "/audio/phrasebook/confession_4.mp3", revision: BUILD_REVISION },
     { url: "/audio/phrasebook/confession_5.mp3", revision: BUILD_REVISION },
     { url: "/audio/phrasebook/confession_6.mp3", revision: BUILD_REVISION },
-    { url: "/audio/phrasebook/confession_7.mp3", revision: BUILD_REVISION },
     // vocab (5개)
     { url: "/audio/phrasebook/vocab_cross.mp3", revision: BUILD_REVISION },
     { url: "/audio/phrasebook/vocab_god.mp3", revision: BUILD_REVISION },
     { url: "/audio/phrasebook/vocab_heaven.mp3", revision: BUILD_REVISION },
     { url: "/audio/phrasebook/vocab_savior.mp3", revision: BUILD_REVISION },
     { url: "/audio/phrasebook/vocab_sin.mp3", revision: BUILD_REVISION },
-    // 섹션 전체 재생 오디오 (4개)
-    { url: "/audio/phrasebook/section_blessing.mp3", revision: BUILD_REVISION },
-    { url: "/audio/phrasebook/section_confession.mp3", revision: BUILD_REVISION },
-    { url: "/audio/phrasebook/section_gospel.mp3", revision: BUILD_REVISION },
-    { url: "/audio/phrasebook/section_vocab.mp3", revision: BUILD_REVISION },
   ],
 });
 

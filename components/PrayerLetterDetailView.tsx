@@ -86,6 +86,7 @@ export default function PrayerLetterDetailView({ letter }: { letter: PrayerLette
             height={900}
             className="w-full h-auto object-contain"
             priority
+            unoptimized
           />
         </div>
 
