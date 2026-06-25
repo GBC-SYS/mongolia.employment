@@ -39,6 +39,7 @@ export default function ImageViewer({ letters }: Props) {
             fill
             className="object-cover object-top"
             sizes="50vw"
+            unoptimized
           />
         </Link>
       ))}
