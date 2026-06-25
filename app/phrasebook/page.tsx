@@ -19,38 +19,20 @@ const glass = {
   WebkitBackdropFilter: "blur(20px) saturate(180%)",
 } as React.CSSProperties;
 
-const SECTION_AUDIO: Record<string, string> = {
-  blessing:   "/audio/phrasebook/section_blessing.mp3",
-  confession: "/audio/phrasebook/section_confession.mp3",
-  gospel:     "/audio/phrasebook/section_gospel.mp3",
-  vocab:      "/audio/phrasebook/section_vocab.mp3",
-};
-
-
 function PhrasebookContent() {
   const [openSections, setOpenSections] = useAtom(phrasebookOpenSectionsAtom);
   const [playingKey, setPlayingKey] = useState<string | null>(null);
   const [playingWordIdx, setPlayingWordIdx] = useState<number>(-1);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const [playingSectionKey, setPlayingSectionKey] = useState<string | null>(null);
-  const sectionAudioRef = useRef<HTMLAudioElement | null>(null);
 
-  // 언마운트 시 재생 중인 오디오·interval 정리
   useEffect(() => {
     return () => {
       if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
       if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
-      if (sectionAudioRef.current) { sectionAudioRef.current.pause(); sectionAudioRef.current = null; }
       if (typeof window !== "undefined") window.speechSynthesis?.cancel();
     };
   }, []);
-
-  const stopSectionAudio = () => {
-    sectionAudioRef.current?.pause();
-    sectionAudioRef.current = null;
-    setPlayingSectionKey(null);
-  };
 
   const stopAll = () => {
     if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
@@ -59,30 +41,11 @@ function PhrasebookContent() {
     if (typeof window !== "undefined") window.speechSynthesis?.cancel();
     setPlayingKey(null);
     setPlayingWordIdx(-1);
-    stopSectionAudio();
   };
 
-  const handleSectionAudio = (sectionKey: string) => {
-    const wasPlaying = playingSectionKey === sectionKey;
-    stopAll();
-    if (wasPlaying) return;
-
-    const src = SECTION_AUDIO[sectionKey];
-    if (!src) return;
-
-    setPlayingSectionKey(sectionKey);
+  const playAudio = (src: string, pron: string, key: string, rate = 0.9) => {
     const audio = new Audio(src);
-    audio.playbackRate = 0.5;
-    sectionAudioRef.current = audio;
-    audio.onended = () => {
-      audio.onended = null;
-      stopSectionAudio();
-    };
-    audio.play().catch(() => stopSectionAudio());
-  };
-
-  const playAudio = (src: string, pron: string, key: string) => {
-    const audio = new Audio(src);
+    audio.playbackRate = rate;
     audioRef.current = audio;
     const pronWords = pron.trim().split(/\s+/);
     setPlayingKey(key);
@@ -140,14 +103,14 @@ function PhrasebookContent() {
     window.speechSynthesis.speak(utterance);
   };
 
-  const handleAudio = (phrase: { mn: string; pron: string; audio?: string }, key: string) => {
-    // stopAll 전에 현재 재생 중인지 캡처 → 토글 정지 버그 방지
+  const handleAudio = (phrase: { mn: string; pron: string; audio?: string }, key: string, sectionKey: string) => {
     const wasPlaying = playingKey === key;
     stopAll();
     if (wasPlaying) return;
 
+    const rate = sectionKey === "vocab" ? 1.0 : 0.9;
     if (phrase.audio) {
-      playAudio(phrase.audio, phrase.pron, key);
+      playAudio(phrase.audio, phrase.pron, key, rate);
     } else {
       speakMongolian(phrase.mn, phrase.pron, key);
     }
@@ -168,9 +131,6 @@ function PhrasebookContent() {
             emoji={section.emoji}
             openOverride={open}
             onToggle={toggle}
-            audioSrc={SECTION_AUDIO[section.key]}
-            isAudioPlaying={playingSectionKey === section.key}
-            onAudioClick={() => handleSectionAudio(section.key)}
           >
             <div className="flex flex-col gap-2">
               {section.phrases.map((phrase, i) => {
@@ -229,7 +189,7 @@ function PhrasebookContent() {
                       </div>
                       {phrase.audio && (
                         <button
-                          onClick={() => handleAudio(phrase, audioKey)}
+                          onClick={() => handleAudio(phrase, audioKey, section.key)}
                           className="flex-shrink-0 p-2 rounded-lg active:scale-90 transition-all"
                           style={{
                             background: isPlaying ? "rgba(22,101,52,0.85)" : "rgba(22,101,52,0.1)",

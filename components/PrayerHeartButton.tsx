@@ -1,16 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { HeartIcon } from "@heroicons/react/24/outline";
 
 const STORAGE_KEY = "prayer_heart_clicked";
 
-export default function PrayerHeartButton({ initialCount = 0 }: { initialCount?: number }) {
-  const [count, setCount] = useState<number>(initialCount);
-  // lazy initializer: 렌더 시점에 localStorage를 읽어 초기값 계산 → effect 불필요
-  const [clicked, setClicked] = useState(() =>
-    typeof window === "undefined" ? false : localStorage.getItem(STORAGE_KEY) === "true"
-  );
+export default function PrayerHeartButton() {
+  const [count, setCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetch("/api/prayer-count")
+      .then((r) => r.json())
+      .then((d) => setCount(d.count))
+      .catch(() => setCount(0));
+  }, []);
+  const [clicked, setClicked] = useState(false);
+
+  useEffect(() => {
+    try { setClicked(localStorage.getItem(STORAGE_KEY) === "true"); } catch {}
+  }, []);
   const [loading, setLoading] = useState(false);
 
   const handleClick = async () => {
@@ -25,7 +33,7 @@ export default function PrayerHeartButton({ initialCount = 0 }: { initialCount?:
       setCount(d.count);
     } catch {
       setClicked(false);
-      setCount((c) => Math.max(0, (c ?? 1) - 1));
+      setCount((c) => (c === null ? 0 : Math.max(0, c - 1)));
       localStorage.removeItem(STORAGE_KEY);
     } finally {
       setLoading(false);
@@ -45,7 +53,7 @@ export default function PrayerHeartButton({ initialCount = 0 }: { initialCount?:
         className={clicked ? "fill-rose-500 text-rose-500" : "text-gray-400"}
       />
       <span className={`text-sm font-semibold tabular-nums ${clicked ? "text-rose-500" : "text-gray-400"}`}>
-        {count.toLocaleString()}
+        {count === null ? "…" : count.toLocaleString()}
       </span>
     </button>
   );

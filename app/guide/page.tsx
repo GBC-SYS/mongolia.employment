@@ -4,8 +4,6 @@ import ClientOnly from "@/components/ClientOnly";
 import { weatherData, safetyData, emergencyData, accommodationData } from "@/data/guide-content";
 import { PhoneIcon, ExclamationTriangleIcon, BuildingOffice2Icon } from "@heroicons/react/24/outline";
 
-export const dynamic = "force-dynamic";
-
 const glass = {
   background: "rgba(255, 255, 255, 0.55)",
   backdropFilter: "blur(20px) saturate(180%)",

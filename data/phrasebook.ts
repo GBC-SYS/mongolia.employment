@@ -38,7 +38,7 @@ export const phrasebookData: PhrasebookSection[] = [
     emoji: "💚",
     introDuration: 4.8,
     phrases: [
-      { ko: "하나님은 당신을 사랑하십니다", mn: "Бурхан танд хайртай.", pron: "부르항 탄드 해르태", audio: "/audio/phrasebook/blessing_0.mp3" },
+      { ko: "하나님은 당신을 사랑하십니다", mn: "Бурхан танд хайртай.", pron: "부르항 탄드 해르태", audio: "/audio/phrasebook/blessing_0.m4a" },
       { ko: "하나님의 축복이 있기를 바랍니다", mn: "Бурхан таныг ивээх болтугай.", pron: "부르항 타닉 이웨-흐 볼토개", audio: "/audio/phrasebook/blessing_1.mp3" },
       { ko: "당신을 위해 기도하겠습니다", mn: "Би таны төлөө залбиръя.", pron: "비 타니 털러 잘비리야", audio: "/audio/phrasebook/blessing_2.mp3" },
       { ko: "예수님은 당신의 친구입니다", mn: "Есүс бол таны найз.", pron: "예수쓰 볼 타니 내즈", audio: "/audio/phrasebook/blessing_3.mp3" },
@@ -47,18 +47,17 @@ export const phrasebookData: PhrasebookSection[] = [
   },
   {
     key: "confession",
-    title: "신앙 고백 & 전도용 문장",
+    title: "신앙 고백 및 전도용 문장",
     emoji: "🙏",
     introDuration: 5.2,
     phrases: [
-      { ko: "예수님 믿으세요", mn: "Есүст итгээрэй.", pron: "예수쓰트 이트게레", audio: "/audio/phrasebook/confession_0.m4a" },
-      { ko: "하나님은 살아계십니다", mn: "Бурхан амьд.", pron: "부르항 에미드", audio: "/audio/phrasebook/confession_1.m4a" },
-      { ko: "예수님 안에서 우리는 하나입니다", mn: "Бид Есүс дотор нэг гэр бүл.", pron: "비드 예수쓰 도토르 넥 게르 불", audio: "/audio/phrasebook/confession_2.m4a" },
+      { ko: "예수님 믿으세요", mn: "Есүст итгээрэй.", pron: "예수쓰트 이트게레", audio: "/audio/phrasebook/confession_0.mp3" },
+      { ko: "하나님은 살아계십니다", mn: "Бурхан амьд.", pron: "부르항 아미드", audio: "/audio/phrasebook/confession_1.mp3" },
+      { ko: "예수님 안에서 우리는 하나입니다", mn: "Бид Есүс дотор нэг гэр бүл.", pron: "비드 예수쓰 도토르 넥 게르 불", audio: "/audio/phrasebook/confession_2.mp3" },
       { ko: "당신은 소중한 사람입니다", mn: "Та бол эрхэм нандин хүн.", pron: "타 볼 에르헴 난딩 훙", audio: "/audio/phrasebook/blessing_4.mp3" },
       { ko: "예수님은 당신의 구원자입니다", mn: "Есүс бол таны Аврагч юм.", pron: "예수스 볼 타니 아우락치 윰", audio: "/audio/phrasebook/confession_4.mp3" },
       { ko: "눈을 감으세요 (기도할 때)", mn: "Нүдээ аниарай.", pron: "뉘데 아니아래", audio: "/audio/phrasebook/confession_5.mp3" },
       { ko: "손을 모으고 기도하세요", mn: "Гартаа залбираара.", pron: "알가- 하우스라-래", audio: "/audio/phrasebook/confession_6.mp3" },
-      { ko: "힘내! (파이팅!)", mn: "Амжилт! / Зүтгээд байгаарай!", pron: "쥬트힡 배가래! / 암질트!", audio: "/audio/phrasebook/confession_7.mp3" },
     ],
   },
   {
@@ -89,7 +88,7 @@ export const phrasebookData: PhrasebookSection[] = [
       {
         ko: "죄인은 천국에 가는 것이 불가능합니다.",
         mn: "Нүгэлт хүн диваажинд очих боломжгүй.",
-        pron: "누구을텡 디와-진드 오칙 보롬쥬이",
+        pron: "티메-세 예수-스 비드니 누글링 툘레-시익 툘러히- 투읻 자갈마이 데-르 나스 바르상.",
         audio: "/audio/phrasebook/gospel_3.mp3",
       },
       {
