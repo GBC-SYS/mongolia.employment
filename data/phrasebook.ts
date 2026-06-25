@@ -57,7 +57,7 @@ export const phrasebookData: PhrasebookSection[] = [
       { ko: "당신은 소중한 사람입니다", mn: "Та бол эрхэм нандин хүн.", pron: "타 볼 에르헴 난딩 훙", audio: "/audio/phrasebook/blessing_4.mp3" },
       { ko: "예수님은 당신의 구원자입니다", mn: "Есүс бол таны Аврагч юм.", pron: "예수스 볼 타니 아우락치 윰", audio: "/audio/phrasebook/confession_4.mp3" },
       { ko: "눈을 감으세요 (기도할 때)", mn: "Нүдээ аниарай.", pron: "뉘데 아니아래", audio: "/audio/phrasebook/confession_5.mp3" },
-      { ko: "손을 모으고 기도하세요", mn: "Гартаа залбираара.", pron: "알가- 하우스라-래", audio: "/audio/phrasebook/confession_6.mp3" },
+      { ko: "손을 모으고 기도하세요", mn: "Гартаа залбираара.", pron: "가르타- 잘비라-라", audio: "/audio/phrasebook/confession_6.mp3" },
     ],
   },
   {
@@ -88,7 +88,7 @@ export const phrasebookData: PhrasebookSection[] = [
       {
         ko: "죄인은 천국에 가는 것이 불가능합니다.",
         mn: "Нүгэлт хүн диваажинд очих боломжгүй.",
-        pron: "티메-세 예수-스 비드니 누글링 툘레-시익 툘러히- 투읻 자갈마이 데-르 나스 바르상.",
+        pron: "누겔트 훙 디와진드 오치흐 볼롬지구이",
         audio: "/audio/phrasebook/gospel_3.mp3",
       },
       {
@@ -112,7 +112,7 @@ export const phrasebookData: PhrasebookSection[] = [
       {
         ko: "예수님을 구원자로 영접하길 원하십니까?",
         mn: "Та Есүсийг өөрийн Аврагчаар хүлээн авахад бэлэн байна уу?",
-        pron: "타 예수-시익 어-링 아우락차-르 훌렝 아와하드 벨렙 뱅 노?",
+        pron: "타 예수-시익 어-링 아우락차-르 훌렝 아와하드 벨렝 배나 오?",
         audio: "/audio/phrasebook/gospel_7.mp3",
       },
       {
