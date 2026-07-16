@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { EnvelopeIcon, BookOpenIcon, CalendarIcon, MusicalNoteIcon, HeartIcon, ChatBubbleLeftRightIcon, BookmarkIcon, ClipboardDocumentListIcon } from "@heroicons/react/24/outline";
+import { EnvelopeIcon, BookOpenIcon, CalendarIcon, MusicalNoteIcon, HeartIcon, ChatBubbleLeftRightIcon, BookmarkIcon, ClipboardDocumentListIcon, CameraIcon, LockClosedIcon } from "@heroicons/react/24/outline";
 import Countdown from "@/components/Countdown";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -160,6 +160,26 @@ export default function HomePage() {
             <p className="font-semibold text-gray-900">공동 기도제목</p>
             <p className="text-gray-500 text-xs mt-0.5">함께 기도해요</p>
           </div>
+        </Link>
+
+        {/* 선교 사진 진입 카드 */}
+        <Link
+          href="/photos"
+          className="rounded-2xl p-5 flex items-center gap-4 active:scale-95 transition-transform"
+          style={cardGlass}
+        >
+          <CameraIcon width={28} height={28} strokeWidth={1.5} style={{ color: brand }} />
+          <div className="flex-1">
+            <p className="font-semibold text-gray-900">선교 사진</p>
+            <p className="text-gray-500 text-xs mt-0.5">몽골 현지 사진 모음</p>
+          </div>
+          <span
+            className="text-xs font-medium px-2.5 py-1 rounded-full flex items-center gap-1"
+            style={{ background: "rgba(22, 101, 52, 0.10)", color: brandDark }}
+          >
+            <LockClosedIcon width={10} height={10} />
+            팀원
+          </span>
         </Link>
 
         {/* 선교 일정 */}
