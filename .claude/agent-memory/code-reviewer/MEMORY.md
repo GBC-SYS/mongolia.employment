@@ -1,0 +1,4 @@
+- [Glass Morphism 스타일 패턴](project_glass_pattern.md) — 페이지는 `const glass` 상수 패턴, 컴포넌트는 인라인 리터럴 혼용 중
+- [아이콘 라이브러리 실제 사용 현황](feedback_icon_library.md) — 문서는 iconoir-react 명시, 실제 코드는 @heroicons/react 사용 중
+- [SW precache revision 고정 문자열 금지](feedback_sw_precache_revision.md) — `revision: "v1"` 고정 시 파일 변경 후에도 SW가 재다운로드 안 함
+- [SSG generateStaticParams 누락 패턴](feedback_ssg_generatestaticparams.md) — SW precache 대상 동적 라우트엔 generateStaticParams 필수
