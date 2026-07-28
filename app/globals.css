@@ -22,3 +22,31 @@ body {
   overscroll-behavior: none;
   word-break: keep-all;
 }
+
+input[type="range"].music-player-seek {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+}
+
+input[type="range"].music-player-seek::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 9999px;
+  background: #166534;
+  cursor: pointer;
+}
+
+input[type="range"].music-player-seek::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 9999px;
+  background: #166534;
+  border: none;
+  cursor: pointer;
+}
+
+input[type="range"].music-player-seek::-moz-range-track {
+  background: transparent;
+}
