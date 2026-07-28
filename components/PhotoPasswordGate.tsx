@@ -13,7 +13,7 @@ interface Props {
   onSuccess: () => void;
 }
 
-const PHOTOS_PASSWORD = "JOHN3:16";
+const PHOTOS_PASSWORD = process.env.NEXT_PUBLIC_PHOTOS_PASSWORD ?? "";
 
 export default function PhotoPasswordGate({ onSuccess }: Props) {
   const [password, setPassword] = useState("");
@@ -35,7 +35,7 @@ export default function PhotoPasswordGate({ onSuccess }: Props) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6 pb-20" style={glass}>
+    <div className="min-h-screen flex flex-col items-center justify-center px-6" style={glass}>
       <div
         className="w-full max-w-sm rounded-3xl p-6"
         style={{
@@ -87,10 +87,6 @@ export default function PhotoPasswordGate({ onSuccess }: Props) {
             {loading ? "확인 중..." : "입장하기"}
           </button>
         </form>
-
-        <p className="text-center text-xs text-gray-400 mt-4">
-          이사야 52:7 — 선교팀 전용
-        </p>
       </div>
     </div>
   );
