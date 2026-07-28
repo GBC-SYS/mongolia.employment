@@ -24,6 +24,8 @@ export default function BottomNav() {
     navItems.forEach(({ href }) => router.prefetch(href));
   }, [router]);
 
+  const hidden = pathname === "/photos";
+
   useEffect(() => {
     const idx = navItems.findIndex((item) => item.href === pathname);
     const el = tabRefs.current[idx];
@@ -38,6 +40,8 @@ export default function BottomNav() {
       width: rect.width + pad * 2,
     });
   }, [pathname]);
+
+  if (hidden) return null;
 
   return (
     <nav

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import PhotoPasswordGate from "@/components/PhotoPasswordGate";
-import PhotoGallery from "@/components/PhotoGallery";
+import PhotoCarousel from "@/components/PhotoCarousel";
 
 export default function PhotosPage() {
   const [unlocked, setUnlocked] = useState(false);
@@ -11,5 +11,5 @@ export default function PhotosPage() {
     return <PhotoPasswordGate onSuccess={() => setUnlocked(true)} />;
   }
 
-  return <PhotoGallery />;
+  return <PhotoCarousel />;
 }
