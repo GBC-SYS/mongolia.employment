@@ -69,7 +69,7 @@ export default function MusicPlayer({
 
   return (
     <div
-      className="w-full rounded-3xl p-4"
+      className="w-full rounded-3xl p-3"
       style={{
         background: "rgba(255, 255, 255, 0.72)",
         backdropFilter: "blur(24px) saturate(180%)",
@@ -89,7 +89,7 @@ export default function MusicPlayer({
         onEnded={() => setIsPlaying(false)}
       />
 
-      <div className="text-center mb-2">
+      <div className="text-center mb-1">
         <p className="text-base font-bold" style={{ color: "#166534" }}>
           {title}
         </p>
@@ -117,35 +117,38 @@ export default function MusicPlayer({
         </span>
       </div>
 
-      <div className="flex items-center justify-between mt-2 px-2">
+      <div className="flex items-center justify-between mt-1 px-2">
         <button
           type="button"
           onClick={onShuffleToggle}
-          className="active:scale-90 transition-transform [touch-action:manipulation]"
+          className="w-11 h-11 flex items-center justify-center active:scale-90 transition-transform [touch-action:manipulation]"
           style={{ color: "#166534" }}
+          aria-label="셔플"
         >
           <ArrowsRightLeftIcon width={20} height={20} strokeWidth={1.8} />
         </button>
         <button
           type="button"
           onClick={onPrevious}
-          className="active:scale-90 transition-transform [touch-action:manipulation]"
+          className="w-11 h-11 flex items-center justify-center active:scale-90 transition-transform [touch-action:manipulation]"
           style={{ color: "#166534" }}
+          aria-label="이전 곡"
         >
           <BackwardIcon width={24} height={24} strokeWidth={1.5} />
         </button>
         <button
           type="button"
           onClick={togglePlay}
-          className="w-12 h-12 rounded-full flex items-center justify-center active:scale-90 transition-transform [touch-action:manipulation]"
+          className="w-11 h-11 rounded-full flex items-center justify-center active:scale-90 transition-transform [touch-action:manipulation]"
           style={{ background: "#166534" }}
+          aria-label={isPlaying ? "일시정지" : "재생"}
         >
           {isPlaying ? (
-            <PauseIcon width={22} height={22} style={{ color: "white" }} />
+            <PauseIcon width={20} height={20} style={{ color: "white" }} />
           ) : (
             <PlayIcon
-              width={22}
-              height={22}
+              width={20}
+              height={20}
               style={{ color: "white" }}
               className="ml-0.5"
             />
@@ -154,15 +157,17 @@ export default function MusicPlayer({
         <button
           type="button"
           onClick={onNext}
-          className="active:scale-90 transition-transform [touch-action:manipulation]"
+          className="w-11 h-11 flex items-center justify-center active:scale-90 transition-transform [touch-action:manipulation]"
           style={{ color: "#166534" }}
+          aria-label="다음 곡"
         >
           <ForwardIcon width={24} height={24} strokeWidth={1.5} />
         </button>
         <button
           type="button"
-          className="active:scale-90 transition-transform [touch-action:manipulation]"
+          className="w-11 h-11 flex items-center justify-center active:scale-90 transition-transform [touch-action:manipulation]"
           style={{ color: "#166534" }}
+          aria-label="재생목록"
         >
           <Bars3Icon width={20} height={20} strokeWidth={1.8} />
         </button>

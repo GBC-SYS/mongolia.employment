@@ -2,3 +2,5 @@
 - [아이콘 라이브러리 실제 사용 현황](feedback_icon_library.md) — 문서는 iconoir-react 명시, 실제 코드는 @heroicons/react 사용 중
 - [SW precache revision 고정 문자열 금지](feedback_sw_precache_revision.md) — `revision: "v1"` 고정 시 파일 변경 후에도 SW가 재다운로드 안 함
 - [SSG generateStaticParams 누락 패턴](feedback_ssg_generatestaticparams.md) — SW precache 대상 동적 라우트엔 generateStaticParams 필수
+- [모바일 아이콘 버튼 터치 타겟 크기 체크](feedback_touch_target_size.md) — icon+padding*2가 44px 미만이면 지적, 신규 추가 버튼 위주로
+- [PhotoCarousel Swiper loop 동기화 패턴](project_photo_carousel_swiper.md) — slideToLoop 올바른 사용법, openEnlarged activeIndex 미동기화 edge case

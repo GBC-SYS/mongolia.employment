@@ -3,36 +3,86 @@
 import { useRef, useState } from "react";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { EffectCoverflow } from "swiper/modules";
+import { Autoplay } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
 import "swiper/css";
-import "swiper/css/effect-coverflow";
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
   ArrowDownTrayIcon,
+  PlayIcon,
+  PauseIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
 
 export interface PhotoMeta {
   filename: string;
   url: string;
-  date: string;
 }
 
 const isIOS = () =>
-  typeof navigator !== "undefined" && /iPad|iPhone|iPod/.test(navigator.userAgent);
+  typeof navigator !== "undefined" &&
+  /iPad|iPhone|iPod/.test(navigator.userAgent);
 
-const MOCK_PHOTOS: PhotoMeta[] = Array.from({ length: 12 }, (_, i) => ({
-  filename: `mongolia_${String(i + 1).padStart(3, "0")}.jpg`,
-  url: `https://picsum.photos/seed/mongolia${i + 1}/800/800`,
-  date: "2026-06-29",
-}));
+const TOTAL_PHOTOS = 785;
+// 018.webp는 0바이트 깨진 파일이라 제외
+const BROKEN_PHOTOS = new Set(["018"]);
+
+const PHOTOS: PhotoMeta[] = Array.from({ length: TOTAL_PHOTOS }, (_, i) =>
+  String(i + 1).padStart(3, "0"),
+)
+  .filter((num) => !BROKEN_PHOTOS.has(num))
+  .map((num) => ({
+    filename: `${num}.webp`,
+    url: `/images/photos/${num}.webp`,
+  }));
 
 export default function PhotoCarousel() {
-  const photos = MOCK_PHOTOS;
+  const photos = PHOTOS;
   const swiperRef = useRef<SwiperType | null>(null);
+  const progressBarRef = useRef<HTMLDivElement | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [downloading, setDownloading] = useState(false);
+  const [autoplayOn, setAutoplayOn] = useState(true);
+  const [enlargedIndex, setEnlargedIndex] = useState<number | null>(null);
+  const enlargedPhoto = enlargedIndex !== null ? photos[enlargedIndex] : null;
+
+  const showEnlarged = (index: number) => {
+    setEnlargedIndex(index);
+    setActiveIndex(index);
+    swiperRef.current?.slideToLoop(index, 0, false);
+  };
+
+  const openEnlarged = (index: number) => {
+    swiperRef.current?.autoplay.stop();
+    showEnlarged(index);
+  };
+
+  const closeEnlarged = () => {
+    setEnlargedIndex(null);
+    if (autoplayOn) swiperRef.current?.autoplay.start();
+  };
+
+  const showPrevEnlarged = () => {
+    if (enlargedIndex === null) return;
+    showEnlarged((enlargedIndex - 1 + photos.length) % photos.length);
+  };
+
+  const showNextEnlarged = () => {
+    if (enlargedIndex === null) return;
+    showEnlarged((enlargedIndex + 1) % photos.length);
+  };
+
+  const toggleAutoplay = () => {
+    if (!swiperRef.current) return;
+    if (autoplayOn) {
+      swiperRef.current.autoplay.stop();
+      if (progressBarRef.current) progressBarRef.current.style.width = "0%";
+    } else {
+      swiperRef.current.autoplay.start();
+    }
+    setAutoplayOn((prev) => !prev);
+  };
 
   const handleDownload = async () => {
     const photo = photos[activeIndex];
@@ -67,104 +117,213 @@ export default function PhotoCarousel() {
   } as React.CSSProperties;
 
   return (
-    <div className="min-h-screen flex flex-col" style={glass}>
-      {/* 컨트롤 바 */}
-      <div className="px-4 pt-12 pb-2 flex-shrink-0 w-full max-w-sm mx-auto">
-        <div
-          className="rounded-3xl p-4"
-          style={{
-            background: "rgba(255, 255, 255, 0.72)",
-            backdropFilter: "blur(24px) saturate(180%)",
-            WebkitBackdropFilter: "blur(24px) saturate(180%)",
-            border: "1.5px solid rgba(255, 255, 255, 0.8)",
-            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.10)",
-          }}
-        >
-          <p
-            className="text-center text-sm font-bold mb-3 tabular-nums"
-            style={{ color: "#166534" }}
+    <>
+      <div className="min-h-screen flex flex-col" style={glass}>
+        {/* 컨트롤 바 */}
+        <div className="px-4 pt-12 pb-2 flex-shrink-0 w-full max-w-sm mx-auto">
+          <div
+            className="rounded-3xl p-4"
+            style={{
+              background: "rgba(255, 255, 255, 0.72)",
+              backdropFilter: "blur(24px) saturate(180%)",
+              WebkitBackdropFilter: "blur(24px) saturate(180%)",
+              border: "1.5px solid rgba(255, 255, 255, 0.8)",
+              boxShadow: "0 8px 32px rgba(0, 0, 0, 0.10)",
+            }}
           >
-            {activeIndex + 1} / {photos.length}
-          </p>
-          <div className="flex items-center justify-between px-4">
-            <button
-              type="button"
-              onClick={() => swiperRef.current?.slidePrev()}
-              disabled={activeIndex === 0}
-              className="disabled:opacity-30 active:scale-90 transition-transform [touch-action:manipulation]"
-              style={{ color: "#166534" }}
-              aria-label="이전 사진"
+            <div className="flex items-center justify-between mb-3">
+              <p
+                className="text-sm font-bold tabular-nums"
+                style={{ color: "#166534" }}
+              >
+                {activeIndex + 1} / {photos.length}
+              </p>
+              <button
+                type="button"
+                onClick={toggleAutoplay}
+                className="flex items-center gap-1.5 rounded-full pl-2.5 pr-3 py-1.5 active:scale-95 transition-transform [touch-action:manipulation]"
+                style={{
+                  background: autoplayOn
+                    ? "#166534"
+                    : "rgba(22, 101, 52, 0.12)",
+                  color: autoplayOn ? "white" : "#166534",
+                }}
+                aria-label={autoplayOn ? "자동재생 끄기" : "자동재생 켜기"}
+              >
+                {autoplayOn ? (
+                  <PauseIcon width={14} height={14} />
+                ) : (
+                  <PlayIcon width={14} height={14} />
+                )}
+                <span className="text-xs font-bold">
+                  {autoplayOn ? "자동재생" : "정지됨"}
+                </span>
+              </button>
+            </div>
+            <div
+              className="h-1 w-full rounded-full overflow-hidden mb-3"
+              style={{ background: "rgba(22, 101, 52, 0.12)" }}
             >
-              <ChevronLeftIcon width={26} height={26} strokeWidth={1.8} />
-            </button>
-            <button
-              type="button"
-              onClick={handleDownload}
-              disabled={downloading}
-              className="w-12 h-12 rounded-full flex items-center justify-center active:scale-90 transition-transform [touch-action:manipulation] disabled:opacity-50"
-              style={{ background: "#166534" }}
-              aria-label="다운로드"
-            >
-              <ArrowDownTrayIcon width={22} height={22} style={{ color: "white" }} />
-            </button>
-            <button
-              type="button"
-              onClick={() => swiperRef.current?.slideNext()}
-              disabled={activeIndex === photos.length - 1}
-              className="disabled:opacity-30 active:scale-90 transition-transform [touch-action:manipulation]"
-              style={{ color: "#166534" }}
-              aria-label="다음 사진"
-            >
-              <ChevronRightIcon width={26} height={26} strokeWidth={1.8} />
-            </button>
+              <div
+                ref={progressBarRef}
+                className="h-full rounded-full"
+                style={{
+                  width: "0%",
+                  background: "#166534",
+                  transition: "width 80ms linear",
+                }}
+              />
+            </div>
+            <div className="flex items-center justify-between px-4">
+              <button
+                type="button"
+                onClick={() => swiperRef.current?.slidePrev()}
+                className="w-11 h-11 flex items-center justify-center active:scale-90 transition-transform [touch-action:manipulation]"
+                style={{ color: "#166534" }}
+                aria-label="이전 사진"
+              >
+                <ChevronLeftIcon width={26} height={26} strokeWidth={1.8} />
+              </button>
+              <button
+                type="button"
+                onClick={handleDownload}
+                disabled={downloading}
+                className="w-12 h-12 rounded-full flex items-center justify-center active:scale-90 transition-transform [touch-action:manipulation] disabled:opacity-50"
+                style={{ background: "#166534" }}
+                aria-label="다운로드"
+              >
+                <ArrowDownTrayIcon
+                  width={22}
+                  height={22}
+                  style={{ color: "white" }}
+                />
+              </button>
+              <button
+                type="button"
+                onClick={() => swiperRef.current?.slideNext()}
+                className="w-11 h-11 flex items-center justify-center active:scale-90 transition-transform [touch-action:manipulation]"
+                style={{ color: "#166534" }}
+                aria-label="다음 사진"
+              >
+                <ChevronRightIcon width={26} height={26} strokeWidth={1.8} />
+              </button>
+            </div>
           </div>
+        </div>
+
+        {/* Swiper 캐러셀 */}
+        <div
+          className="flex-1 flex items-center min-w-0"
+          style={{ paddingBottom: "calc(256px + env(safe-area-inset-bottom))" }}
+        >
+          <Swiper
+            modules={[Autoplay]}
+            centeredSlides
+            slidesPerView="auto"
+            spaceBetween={36}
+            grabCursor
+            loop
+            loopAdditionalSlides={2}
+            autoplay={{
+              delay: 3000,
+              pauseOnMouseEnter: true,
+              disableOnInteraction: false,
+            }}
+            onAutoplayTimeLeft={(_swiper, _timeLeft, percentage) => {
+              if (progressBarRef.current) {
+                progressBarRef.current.style.width = `${(1 - percentage) * 100}%`;
+              }
+            }}
+            onSwiper={(swiper) => {
+              swiperRef.current = swiper;
+            }}
+            onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
+            className="w-full"
+          >
+            {photos.map((photo, i) => (
+              <SwiperSlide
+                key={photo.filename}
+                style={{ width: "78vw", maxWidth: "384px", flexShrink: 0 }}
+              >
+                <div
+                  className="relative aspect-[3/4] rounded-3xl overflow-hidden shadow-xl bg-gray-100 cursor-zoom-in"
+                  onClick={() => openEnlarged(i)}
+                >
+                  <Image
+                    src={photo.url}
+                    alt={`몽골 선교 사진 ${i + 1}`}
+                    fill
+                    unoptimized
+                    loading={i === 0 ? "eager" : "lazy"}
+                    className="object-cover"
+                  />
+                </div>
+              </SwiperSlide>
+            ))}
+          </Swiper>
         </div>
       </div>
 
-      {/* Swiper 코드플로우 캐러셀 */}
-      <div
-        className="flex-1 flex items-center min-w-0"
-        style={{ paddingBottom: "calc(256px + env(safe-area-inset-bottom))" }}
-      >
-        <Swiper
-          modules={[EffectCoverflow]}
-          effect="coverflow"
-          centeredSlides
-          slidesPerView="auto"
-          spaceBetween={20}
-          grabCursor
-          coverflowEffect={{
-            rotate: 0,
-            stretch: 20,
-            depth: 120,
-            modifier: 1,
-            slideShadows: false,
-          }}
-          onSwiper={(swiper) => {
-            swiperRef.current = swiper;
-          }}
-          onSlideChange={(swiper) => setActiveIndex(swiper.activeIndex)}
-          className="w-full"
+      {enlargedPhoto && (
+        <div
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center p-4"
+          style={{ background: "rgba(0, 0, 0, 0.9)" }}
+          onClick={closeEnlarged}
         >
-          {photos.map((photo, i) => (
-            <SwiperSlide
-              key={photo.filename}
-              style={{ width: "78vw", maxWidth: "384px", flexShrink: 0 }}
+          <button
+            type="button"
+            onClick={closeEnlarged}
+            className="absolute right-4 p-2 rounded-full active:scale-90 transition-transform [touch-action:manipulation]"
+            style={{
+              top: "calc(env(safe-area-inset-top) + 16px)",
+              background: "rgba(255, 255, 255, 0.15)",
+            }}
+            aria-label="닫기"
+          >
+            <XMarkIcon width={22} height={22} className="text-white" />
+          </button>
+
+          <div
+            className="relative w-full max-w-lg h-[75vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Image
+              src={enlargedPhoto.url}
+              alt="몽골 선교 사진 확대"
+              fill
+              unoptimized
+              className="object-contain"
+            />
+
+            <button
+              type="button"
+              onClick={showPrevEnlarged}
+              className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-11 h-11 flex items-center justify-center rounded-full active:scale-90 transition-transform [touch-action:manipulation]"
+              style={{ background: "rgba(255, 255, 255, 0.15)" }}
+              aria-label="이전 사진"
             >
-              <div className="relative aspect-[3/4] rounded-3xl overflow-hidden shadow-xl bg-gray-100">
-                <Image
-                  src={photo.url}
-                  alt={`선교 사진 ${photo.date}`}
-                  fill
-                  unoptimized
-                  loading={i === 0 ? "eager" : "lazy"}
-                  className="object-cover"
-                />
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      </div>
-    </div>
+              <ChevronLeftIcon width={26} height={26} className="text-white" />
+            </button>
+
+            <button
+              type="button"
+              onClick={showNextEnlarged}
+              className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-11 h-11 flex items-center justify-center rounded-full active:scale-90 transition-transform [touch-action:manipulation]"
+              style={{ background: "rgba(255, 255, 255, 0.15)" }}
+              aria-label="다음 사진"
+            >
+              <ChevronRightIcon width={26} height={26} className="text-white" />
+            </button>
+          </div>
+
+          <p
+            className="text-white/60 text-xs mt-4"
+            style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+          >
+            배경을 탭하면 닫힙니다
+          </p>
+        </div>
+      )}
+    </>
   );
 }
