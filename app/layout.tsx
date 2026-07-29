@@ -97,7 +97,7 @@ export default function RootLayout({
           #app-panel은 lg 브레이크포인트에서 backdrop-filter가 걸려 fixed 자손의
           containing block이 되어버리므로, 그 조상 밖에 둬야 전체 브라우저 너비
           기준으로 고정된다 (데스크탑에서도 390px 패널이 아닌 창 전체 중앙에 위치).
-          bottom 오프셋 자체는 /photos(BottomNav 없음) 분기가 필요해 MusicPlayerDock 내부에서 처리.
+          /photos 페이지에서만 렌더링(그 외 경로는 null) — MusicPlayerDock 내부에서 처리.
         */}
         <MusicPlayerDock />
 
