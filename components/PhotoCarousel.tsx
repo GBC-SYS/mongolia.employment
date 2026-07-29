@@ -73,6 +73,13 @@ export default function PhotoCarousel() {
     showEnlarged((enlargedIndex + 1) % photos.length);
   };
 
+  const jumpSlides = (delta: number) => {
+    const swiper = swiperRef.current;
+    if (!swiper) return;
+    const target = (swiper.realIndex + delta + photos.length) % photos.length;
+    swiper.slideToLoop(target);
+  };
+
   const toggleAutoplay = () => {
     if (!swiperRef.current) return;
     if (autoplayOn) {
@@ -177,10 +184,10 @@ export default function PhotoCarousel() {
             <div className="flex items-center justify-between px-4">
               <button
                 type="button"
-                onClick={() => swiperRef.current?.slidePrev()}
+                onClick={() => jumpSlides(-3)}
                 className="w-11 h-11 flex items-center justify-center active:scale-90 transition-transform [touch-action:manipulation]"
                 style={{ color: "#166534" }}
-                aria-label="이전 사진"
+                aria-label="이전 사진 3장"
               >
                 <ChevronLeftIcon width={26} height={26} strokeWidth={1.8} />
               </button>
@@ -200,10 +207,10 @@ export default function PhotoCarousel() {
               </button>
               <button
                 type="button"
-                onClick={() => swiperRef.current?.slideNext()}
+                onClick={() => jumpSlides(3)}
                 className="w-11 h-11 flex items-center justify-center active:scale-90 transition-transform [touch-action:manipulation]"
                 style={{ color: "#166534" }}
-                aria-label="다음 사진"
+                aria-label="다음 사진 3장"
               >
                 <ChevronRightIcon width={26} height={26} strokeWidth={1.8} />
               </button>
