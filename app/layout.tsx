@@ -24,9 +24,15 @@ const pretendard = localFont({
   variable: "--font-pretendard",
 });
 
+// maximumScale/userScalable: 앱 전체에서 핀치 줌 비활성화.
+// iOS 10+ Safari는 일반 탭에서 사용자의 직접 핀치 줌을 정책상 무시하지만
+// (애플의 접근성 보호 정책), 카카오톡 인앱 브라우저·홈 화면 추가(PWA)에서는
+// 적용됨. Android Chrome에서는 항상 적용됨.
 export const viewport = {
   width: "device-width",
   initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
   viewportFit: "cover",
   themeColor: "#166534",
 };

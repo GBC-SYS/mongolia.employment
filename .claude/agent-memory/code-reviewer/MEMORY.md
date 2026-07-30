@@ -7,3 +7,4 @@
 - [/photos 페이지 비밀번호 잠금 + localStorage 언락 패턴](project_photos_page_lock.md) — useSyncExternalStore 마운트 감지, ClientOnly 중복, CLAUDE.md 라우트표 갱신 필요
 - [Vercel Hobby 이미지 최적화 월 1,000장 한도](project_vercel_image_optimization_limit.md) — unoptimized 제거/새 이미지 세트 추가 시마다 총 소스 이미지 수 재계산 필요
 - [MusicPlayerDock ↔ 확대뷰 photoEnlargedAtom 패턴](project_music_dock_photo_enlarge.md) — "숨김=return null" 언마운트가 `<audio>` 재생 상태를 죽이는 회귀 패턴(치명), display:none 대안 권장
+- [핀치 줌 비활성화 — iOS Safari 미적용 사실](project_viewport_pinch_zoom_disable.md) — layout.tsx viewport의 userScalable:false는 iOS Safari 일반 탭에서 무시됨(iOS10+ 접근성 오버라이드), WCAG 1.4.4 트레이드오프
