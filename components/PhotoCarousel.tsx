@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSetAtom } from "jotai";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Virtual } from "swiper/modules";
@@ -42,6 +43,7 @@ const PHOTOS: PhotoMeta[] = Array.from({ length: TOTAL_PHOTOS }, (_, i) =>
 
 export default function PhotoCarousel() {
   const photos = PHOTOS;
+  const router = useRouter();
   const swiperRef = useRef<SwiperType | null>(null);
   const progressBarRef = useRef<HTMLDivElement | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -90,6 +92,14 @@ export default function PhotoCarousel() {
     setEnlargedIndex(null);
     setPhotoEnlarged(false);
     if (autoplayOn) swiperRef.current?.autoplay.start();
+  };
+
+  const handleBack = () => {
+    const isSameOrigin =
+      document.referrer &&
+      new URL(document.referrer).origin === window.location.origin;
+    if (isSameOrigin) router.back();
+    else router.replace("/");
   };
 
   const showPrevEnlarged = () => {
@@ -209,6 +219,29 @@ export default function PhotoCarousel() {
 
   return (
     <>
+      {/* 뒤로가기: 릴스형 전체화면 뷰라 BottomNav/DesktopHero가 이 경로에서는
+          PC/모바일 모두 숨겨져 있어, 이 버튼이 없으면 /photos에서 홈으로
+          돌아갈 방법이 전혀 없다 (브라우저 자체 뒤로가기 제외).
+          glass(backdrop-filter) div의 형제로 둬서 fixed 자손의 containing
+          block이 조상 backdrop-filter로 오염되는 걸 방지한다. */}
+      <button
+        type="button"
+        onClick={handleBack}
+        className="fixed left-4 z-40 p-3 rounded-full active:opacity-50 transition-opacity [touch-action:manipulation]"
+        style={{
+          top: "calc(env(safe-area-inset-top) + 16px)",
+          background: "rgba(0, 0, 0, 0.35)",
+        }}
+        aria-label="뒤로가기"
+      >
+        <ChevronLeftIcon
+          width={22}
+          height={22}
+          className="text-white"
+          style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.5))" }}
+        />
+      </button>
+
       <div
         className="h-dvh overflow-hidden flex flex-col lg:h-auto lg:min-h-screen lg:overflow-visible"
         style={glass}
