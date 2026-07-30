@@ -197,6 +197,7 @@ public/
 | `/phrasebook` | `app/phrasebook/page.tsx` | Dynamic | Jotai 사용 |
 | `/cuesheet` | `app/cuesheet/page.tsx` | Client | `"use client"` + `useState` |
 | `/song` | `app/song/page.tsx` | Client | `"use client"` + `useRouter` |
+| `/photos` | `app/photos/page.tsx` | Client | `"use client"` + `useState`, `ClientOnly`로 localStorage 언락 상태 확인 |
 
 > 새 라우트 추가 시 이 표를 반드시 업데이트할 것.
 

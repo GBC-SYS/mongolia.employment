@@ -3,4 +3,5 @@
 - [SW precache revision 고정 문자열 금지](feedback_sw_precache_revision.md) — `revision: "v1"` 고정 시 파일 변경 후에도 SW가 재다운로드 안 함
 - [SSG generateStaticParams 누락 패턴](feedback_ssg_generatestaticparams.md) — SW precache 대상 동적 라우트엔 generateStaticParams 필수
 - [모바일 아이콘 버튼 터치 타겟 크기 체크](feedback_touch_target_size.md) — icon+padding*2가 44px 미만이면 지적, 신규 추가 버튼 위주로
-- [PhotoCarousel Swiper loop 동기화 패턴](project_photo_carousel_swiper.md) — slideToLoop 올바른 사용법, openEnlarged activeIndex 미동기화 edge case
+- [PhotoCarousel Swiper loop 동기화 패턴](project_photo_carousel_swiper.md) — slideToLoop 사용법, jumpSlides realIndex 수정 완료, onSwiper autoplay.stop() 레이스 없음(소스 검증)
+- [/photos 페이지 비밀번호 잠금 + localStorage 언락 패턴](project_photos_page_lock.md) — useSyncExternalStore 마운트 감지, ClientOnly 중복, CLAUDE.md 라우트표 갱신 필요

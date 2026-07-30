@@ -43,7 +43,7 @@ export default function PhotoCarousel() {
   const progressBarRef = useRef<HTMLDivElement | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [downloading, setDownloading] = useState(false);
-  const [autoplayOn, setAutoplayOn] = useState(true);
+  const [autoplayOn, setAutoplayOn] = useState(false);
   const [enlargedIndex, setEnlargedIndex] = useState<number | null>(null);
   const enlargedPhoto = enlargedIndex !== null ? photos[enlargedIndex] : null;
 
@@ -243,6 +243,7 @@ export default function PhotoCarousel() {
             }}
             onSwiper={(swiper) => {
               swiperRef.current = swiper;
+              swiper.autoplay.stop();
             }}
             onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
             className="w-full"
