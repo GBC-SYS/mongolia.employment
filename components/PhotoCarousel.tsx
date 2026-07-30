@@ -1,11 +1,12 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay } from "swiper/modules";
+import { Autoplay, Virtual } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
 import "swiper/css";
+import "swiper/css/virtual";
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -47,16 +48,19 @@ export default function PhotoCarousel() {
   const [enlargedIndex, setEnlargedIndex] = useState<number | null>(null);
   const enlargedPhoto = enlargedIndex !== null ? photos[enlargedIndex] : null;
 
-  const showEnlarged = (index: number) => {
+  const showEnlarged = useCallback((index: number) => {
     setEnlargedIndex(index);
     setActiveIndex(index);
     swiperRef.current?.slideToLoop(index, 0, false);
-  };
+  }, []);
 
-  const openEnlarged = (index: number) => {
-    swiperRef.current?.autoplay.stop();
-    showEnlarged(index);
-  };
+  const openEnlarged = useCallback(
+    (index: number) => {
+      swiperRef.current?.autoplay.stop();
+      showEnlarged(index);
+    },
+    [showEnlarged],
+  );
 
   const closeEnlarged = () => {
     setEnlargedIndex(null);
@@ -122,6 +126,32 @@ export default function PhotoCarousel() {
     backdropFilter: "blur(20px) saturate(180%)",
     WebkitBackdropFilter: "blur(20px) saturate(180%)",
   } as React.CSSProperties;
+
+  // 모바일: 위아래 스와이프 카드형 / PC(lg 이상): 기존 좌우 스와이프 유지
+  const slides = useMemo(
+    () =>
+      photos.map((photo, i) => (
+        <SwiperSlide
+          key={photo.filename}
+          className="shrink-0 aspect-[3/4] h-[min(48vh,380px)]! w-[min(36vh,285px)]! lg:h-auto! lg:w-[78vw]! lg:max-w-[384px]!"
+        >
+          <div
+            className="relative w-full h-full rounded-3xl overflow-hidden shadow-xl bg-gray-100 cursor-zoom-in"
+            onClick={() => openEnlarged(i)}
+          >
+            <Image
+              src={photo.url}
+              alt={`몽골 선교 사진 ${i + 1}`}
+              fill
+              sizes="(max-width: 1023px) min(36vh, 285px), 78vw"
+              loading={i === 0 ? "eager" : "lazy"}
+              className="object-cover"
+            />
+          </div>
+        </SwiperSlide>
+      )),
+    [photos, openEnlarged],
+  );
 
   return (
     <>
@@ -224,7 +254,12 @@ export default function PhotoCarousel() {
           style={{ paddingBottom: "calc(256px + env(safe-area-inset-bottom))" }}
         >
           <Swiper
-            modules={[Autoplay]}
+            modules={[Autoplay, Virtual]}
+            virtual
+            direction="vertical"
+            breakpoints={{
+              1024: { direction: "horizontal" },
+            }}
             centeredSlides
             slidesPerView="auto"
             spaceBetween={36}
@@ -246,28 +281,9 @@ export default function PhotoCarousel() {
               swiper.autoplay.stop();
             }}
             onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
-            className="w-full"
+            className="w-full h-[min(56vh,440px)] lg:h-auto"
           >
-            {photos.map((photo, i) => (
-              <SwiperSlide
-                key={photo.filename}
-                style={{ width: "78vw", maxWidth: "384px", flexShrink: 0 }}
-              >
-                <div
-                  className="relative aspect-[3/4] rounded-3xl overflow-hidden shadow-xl bg-gray-100 cursor-zoom-in"
-                  onClick={() => openEnlarged(i)}
-                >
-                  <Image
-                    src={photo.url}
-                    alt={`몽골 선교 사진 ${i + 1}`}
-                    fill
-                    unoptimized
-                    loading={i === 0 ? "eager" : "lazy"}
-                    className="object-cover"
-                  />
-                </div>
-              </SwiperSlide>
-            ))}
+            {slides}
           </Swiper>
         </div>
       </div>
@@ -299,7 +315,8 @@ export default function PhotoCarousel() {
               src={enlargedPhoto.url}
               alt="몽골 선교 사진 확대"
               fill
-              unoptimized
+              priority
+              sizes="(max-width: 512px) 100vw, 512px"
               className="object-contain"
             />
 
