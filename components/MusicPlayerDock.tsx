@@ -12,7 +12,7 @@ export default function MusicPlayerDock() {
   return (
     <div
       className="fixed inset-x-0 z-50 flex justify-center px-4 pointer-events-none"
-      style={{ bottom: "env(safe-area-inset-bottom)" }}
+      style={{ bottom: "calc(env(safe-area-inset-bottom) + 16px)" }}
     >
       <div className="w-full max-w-sm pointer-events-auto">
         <MusicPlayer

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Virtual } from "swiper/modules";
@@ -47,6 +47,20 @@ export default function PhotoCarousel() {
   const [autoplayOn, setAutoplayOn] = useState(false);
   const [enlargedIndex, setEnlargedIndex] = useState<number | null>(null);
   const enlargedPhoto = enlargedIndex !== null ? photos[enlargedIndex] : null;
+
+  // Swiper의 virtual+loop 모드는 direction을 런타임에 바꾸면(breakpoints 포함)
+  // realIndex가 깨지는 라이브러리 버그가 있어, PC/모바일 Swiper 인스턴스를
+  // 아예 분리해서(direction 고정) 렌더링한다 — 1024px 경계를 넘을 때만 리마운트됨
+  const [isDesktop, setIsDesktop] = useState(
+    () => typeof window !== "undefined" && window.innerWidth >= 1024,
+  );
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const update = () => setIsDesktop(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
 
   const showEnlarged = useCallback((index: number) => {
     setEnlargedIndex(index);
@@ -133,31 +147,63 @@ export default function PhotoCarousel() {
       photos.map((photo, i) => (
         <SwiperSlide
           key={photo.filename}
-          className="shrink-0 aspect-[3/4] h-[min(48vh,380px)]! w-[min(36vh,285px)]! lg:h-auto! lg:w-[78vw]! lg:max-w-[384px]!"
+          className="shrink-0 h-full! w-full! lg:aspect-[3/4] lg:h-auto! lg:w-[78vw]! lg:max-w-[384px]!"
         >
-          <div
-            className="relative w-full h-full rounded-3xl overflow-hidden shadow-xl bg-gray-100 cursor-zoom-in"
-            onClick={() => openEnlarged(i)}
-          >
-            <Image
-              src={photo.url}
-              alt={`몽골 선교 사진 ${i + 1}`}
-              fill
-              sizes="(max-width: 1023px) min(36vh, 285px), 78vw"
-              loading={i === 0 ? "eager" : "lazy"}
-              className="object-cover"
-            />
+          <div className="w-full h-full p-4 pb-6 lg:p-0">
+            <div
+              className="relative w-full h-full rounded-3xl shadow-xl overflow-hidden bg-gray-100 cursor-zoom-in"
+              onClick={() => openEnlarged(i)}
+            >
+              <Image
+                src={photo.url}
+                alt={`몽골 선교 사진 ${i + 1}`}
+                fill
+                sizes="(max-width: 1023px) 100vw, 384px"
+                loading={i === 0 ? "eager" : "lazy"}
+                className="object-cover"
+              />
+            </div>
           </div>
         </SwiperSlide>
       )),
     [photos, openEnlarged],
   );
 
+  const commonSwiperProps = {
+    modules: [Autoplay, Virtual],
+    centeredSlides: true,
+    grabCursor: true,
+    loop: true,
+    autoplay: {
+      delay: 3000,
+      pauseOnMouseEnter: true,
+      disableOnInteraction: false,
+    },
+    onAutoplayTimeLeft: (
+      _swiper: SwiperType,
+      _timeLeft: number,
+      percentage: number,
+    ) => {
+      if (progressBarRef.current) {
+        progressBarRef.current.style.width = `${(1 - percentage) * 100}%`;
+      }
+    },
+    onSwiper: (swiper: SwiperType) => {
+      swiperRef.current = swiper;
+      if (autoplayOn) swiper.autoplay.start();
+      else swiper.autoplay.stop();
+    },
+    onSlideChange: (swiper: SwiperType) => setActiveIndex(swiper.realIndex),
+  };
+
   return (
     <>
-      <div className="min-h-screen flex flex-col" style={glass}>
-        {/* 컨트롤 바 */}
-        <div className="px-4 pt-12 pb-2 flex-shrink-0 w-full max-w-sm mx-auto">
+      <div
+        className="h-dvh overflow-hidden flex flex-col lg:h-auto lg:min-h-screen lg:overflow-visible"
+        style={glass}
+      >
+        {/* 컨트롤 바: 모바일에서는 릴스형 전체화면 뷰를 위해 숨김, PC는 기존 유지 */}
+        <div className="hidden lg:block px-4 pt-6 pb-2 flex-shrink-0 w-full max-w-sm mx-auto">
           <div
             className="rounded-3xl p-4"
             style={{
@@ -249,42 +295,42 @@ export default function PhotoCarousel() {
         </div>
 
         {/* Swiper 캐러셀 */}
-        <div
-          className="flex-1 flex items-center min-w-0"
-          style={{ paddingBottom: "calc(256px + env(safe-area-inset-bottom))" }}
-        >
-          <Swiper
-            modules={[Autoplay, Virtual]}
-            virtual
-            direction="vertical"
-            breakpoints={{
-              1024: { direction: "horizontal" },
-            }}
-            centeredSlides
-            slidesPerView="auto"
-            spaceBetween={36}
-            grabCursor
-            loop
-            loopAdditionalSlides={2}
-            autoplay={{
-              delay: 3000,
-              pauseOnMouseEnter: true,
-              disableOnInteraction: false,
-            }}
-            onAutoplayTimeLeft={(_swiper, _timeLeft, percentage) => {
-              if (progressBarRef.current) {
-                progressBarRef.current.style.width = `${(1 - percentage) * 100}%`;
-              }
-            }}
-            onSwiper={(swiper) => {
-              swiperRef.current = swiper;
-              swiper.autoplay.stop();
-            }}
-            onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
-            className="w-full h-[min(56vh,440px)] lg:h-auto"
-          >
-            {slides}
-          </Swiper>
+        <div className="flex-1 flex items-center min-w-0 min-h-0 pt-[env(safe-area-inset-top)] pb-[calc(166px+env(safe-area-inset-bottom))] lg:pt-0 lg:pb-[calc(256px+env(safe-area-inset-bottom))]">
+          {/*
+            PC/모바일 Swiper를 key로 강제 구분해서 완전히 다른 인스턴스로 만든다.
+            key 없이 삼항으로만 분기하면 React가 같은 타입/같은 위치라 인스턴스를
+            재사용해버리고, 그러면 direction prop이 바뀔 때 Swiper 내부적으로
+            swiper.changeDirection()이 호출되는데 이게 virtual+loop 조합에서
+            realIndex를 깨뜨리는 라이브러리 버그 경로다(PC 카드 중앙정렬 버그 원인).
+            key로 완전 리마운트시켜 이 경로 자체를 타지 않게 한다.
+          */}
+          {isDesktop ? (
+            <Swiper
+              key="desktop"
+              initialSlide={activeIndex}
+              {...commonSwiperProps}
+              virtual={{ slidesPerViewAutoSlideSize: 384 }}
+              direction="horizontal"
+              slidesPerView="auto"
+              spaceBetween={36}
+              className="w-full h-auto"
+            >
+              {slides}
+            </Swiper>
+          ) : (
+            <Swiper
+              key="mobile"
+              initialSlide={activeIndex}
+              {...commonSwiperProps}
+              virtual
+              direction="vertical"
+              slidesPerView={1}
+              spaceBetween={0}
+              className="w-full h-full [&_.swiper-wrapper]:h-full!"
+            >
+              {slides}
+            </Swiper>
+          )}
         </div>
       </div>
 
@@ -296,8 +342,11 @@ export default function PhotoCarousel() {
         >
           <button
             type="button"
-            onClick={closeEnlarged}
-            className="absolute right-4 p-2 rounded-full active:scale-90 transition-transform [touch-action:manipulation]"
+            onClick={(e) => {
+              e.stopPropagation();
+              closeEnlarged();
+            }}
+            className="absolute right-4 p-3 rounded-full active:scale-90 transition-transform [touch-action:manipulation]"
             style={{
               top: "calc(env(safe-area-inset-top) + 16px)",
               background: "rgba(255, 255, 255, 0.15)",

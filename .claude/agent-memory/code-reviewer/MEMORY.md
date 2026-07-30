@@ -3,6 +3,6 @@
 - [SW precache revision 고정 문자열 금지](feedback_sw_precache_revision.md) — `revision: "v1"` 고정 시 파일 변경 후에도 SW가 재다운로드 안 함
 - [SSG generateStaticParams 누락 패턴](feedback_ssg_generatestaticparams.md) — SW precache 대상 동적 라우트엔 generateStaticParams 필수
 - [모바일 아이콘 버튼 터치 타겟 크기 체크](feedback_touch_target_size.md) — icon+padding*2가 44px 미만이면 지적, 신규 추가 버튼 위주로
-- [PhotoCarousel Swiper loop 동기화 패턴](project_photo_carousel_swiper.md) — Tailwind v4 @layer가 swiper/css(unlayered)에 밀려 SwiperSlide 크기클래스 무력화 위험(치명), sizes 재확인 필요
+- [PhotoCarousel Swiper loop 동기화 패턴](project_photo_carousel_swiper.md) — key 없는 isDesktop 삼항 Swiper 분기는 React가 인스턴스 재사용해 direction 런타임변경 버그 재발(치명), sizes/@layer 이슈도 기록
 - [/photos 페이지 비밀번호 잠금 + localStorage 언락 패턴](project_photos_page_lock.md) — useSyncExternalStore 마운트 감지, ClientOnly 중복, CLAUDE.md 라우트표 갱신 필요
 - [Vercel Hobby 이미지 최적화 월 1,000장 한도](project_vercel_image_optimization_limit.md) — unoptimized 제거/새 이미지 세트 추가 시마다 총 소스 이미지 수 재계산 필요

@@ -1,6 +1,6 @@
 ---
 name: PhotoCarousel Swiper loop 동기화 패턴
-description: components/PhotoCarousel.tsx의 확대뷰-배경캐러셀 상태 동기화, Swiper v14 loop/virtual/autoplay, Tailwind v4 @layer가 swiper/css(unlayered)에 밀려 SwiperSlide 크기 클래스가 무력화되는 캐스케이드 레이어 충돌 이슈
+description: components/PhotoCarousel.tsx의 확대뷰-배경캐러셀 상태 동기화, Swiper v14 loop/virtual/autoplay, Tailwind v4 @layer vs unlayered swiper/css 충돌(!important로 해결), flex 자식 min-h-0 순환 높이 버그, 모바일 릴스형 풀스크린 재설계
 type: project
 ---
 
@@ -70,6 +70,45 @@ const jumpSlides = (delta: number) => {
 
 **Tailwind v4 arbitrary value 안의 콤마 포함 CSS 함수(`h-[min(48vh,380px)]`) — 정상 파싱됨.** 스페이스만 `_`로 이스케이프하면 되고 콤마는 이스케이프 불필요(`grid-cols-[repeat(3,minmax(0,1fr))]` 같은 공식 문서 예시와 동일 패턴). 재확인 불필요.
 
+**2026-07-30(3차) 리뷰: 모바일 릴스형 풀스크린 재설계 + 이전 회귀 최종 해소 확인.**
+
+- 모바일 디자인이 카드형(`h-[min(48vh,380px)]`)에서 **인스타 릴스 스타일 세로 풀스크린**(`h-full! w-full!`, 뷰포트 전체를 채우는 1장)으로 재변경됨. 이에 따라 `sizes="(max-width: 1023px) 100vw, 78vw"`가 다시 실제 렌더 크기와 정확히 일치(모바일 100vw = 실측 정확). **이전에 지적했던 sizes 부정확 이슈는 이번 재설계로 자연 해소됨** — card 방식으로 되돌아가면 다시 어긋나므로 향후 재변경 시 재확인 필요.
+- **🔴였던 "Tailwind 유틸리티가 unlayered `swiper/css`에 밀려 SwiperSlide 크기가 무력화될 위험" — `!` important 접미사(`h-full! w-full! lg:h-auto! lg:w-[78vw]! lg:max-w-[384px]!`) 적용으로 해소 확인.** CSS 스펙상 `!important` 선언은 layer 소속과 무관하게 모든 일반(non-important) 선언(인라인 style 포함)보다 항상 우선하므로, unlayered `swiper/css`의 인라인 강제(`slide.style.height/width`, virtual+slidesPerView="auto" 조합 시 Swiper가 무조건 주입)까지도 이걸로 확실히 이김. 재지적 불필요, 단 향후 이 `!` 접미사들을 실수로 제거하면 즉시 재발하므로 **왜 필요한지 설명하는 주석이 코드에 없다는 점은 유지보수 리스크로 남음(🟡, 제안: 한 줄 주석 추가)**.
+- **신규 버그 A 확인(치명적, 수정 완료): flex 자식 퍼센트 높이 순환 참조.** 최상위 컨테이너를 `min-h-screen`(모바일에서도 무제한 성장 가능) → `h-dvh overflow-hidden`(모바일)로, Swiper를 감싸는 `flex-1` div에 `min-h-0` 추가로 수정. `min-h-0` 없으면 flex item 기본값 `min-height:auto`가 콘텐츠(가상 렌더링된 슬라이드들) 오버플로우를 막아 컨테이너가 무한정 부풀어 오름(실측 80,320px→844px, 개발자 보고). 데스크탑(`lg:min-h-screen lg:overflow-visible`, `lg:h-auto`)에는 부작용 없음 — 데스크탑에서는 Swiper 루트가 `lg:h-auto`라 퍼센트 연쇄가 애초에 발생하지 않고(슬라이드 자체 높이가 `aspect-[3/4]`로 콘텐츠 기반 확정), `.swiper-wrapper`의 `h-full!`도 결국 콘텐츠 기반 값으로 수렴함(순환이 아니라 단순 축소 위임). CSS 코드 리뷰로 재검증 완료, 실기기 재확인 불필요할 정도로 원리적으로 안전.
+- **모바일 컨트롤 바 `hidden lg:block` 전체 은닉 — 코드 참조 무결성은 문제 없음.** `downloading`/`autoplayOn`/`progressBarRef` 모두 조건부 렌더링이 아니라 CSS `hidden` 클래스로만 숨겨져 있어 DOM/ref 자체는 유지됨 → `onAutoplayTimeLeft`, `toggleAutoplay` 등 참조 코드 깨지지 않음. **단, 제품 관점에서 이번 변경으로 비-iOS 모바일(Android 등) 사용자는 다운로드 버튼에 접근할 수 있는 유일한 경로를 완전히 잃음.** `handleDownload`의 `isIOS()` 분기 알림("길게 눌러 저장")도 애초에 버튼이 안 보이니 트리거될 일이 없음 — 네이티브 롱프레스 저장은 여전히 동작할 가능성이 높지만(next/image가 결국 `<img>`로 렌더), 앱이 아무 안내도 하지 않는 상태가 됨. 사용자가 명시적으로 요청한 사항이라 버그는 아니지만, 향후 리뷰 시 "안내 문구 추가 여부"를 확인할 것(🟡, 우선순위 낮음, 기획 확인 필요 사항으로 기록만).
+- `spaceBetween={0}` + `breakpoints={{1024:{direction:"horizontal",spaceBetween:36}}}` — `shared/swiper-core.mjs`의 `setBreakpoint()`가 `directionChanged` 감지 시 `changeDirection()`, `needsReLoop` 시 `loopDestroy+loopCreate+updateSlides`를 호출하는 공식 지원 흐름이라 확인됨(2026-07-30 2차 리뷰 내용과 동일 결론, 재확인만).
+- 닫기 버튼(38×38px)은 여전히 미수정(우선순위 낮음, 기존 이슈 반복 언급 불필요 — 다만 이번 리뷰에서 `onClick`에 `stopPropagation`이 없어 배경 클릭 핸들러(`closeEnlarged`)와 버블링으로 중복 호출됨을 신규 발견. 부작용은 없음(멱등), 우선순위 매우 낮은 코드 정리 제안).
+
+**2026-07-30(4차) 리뷰: `breakpoints` 제거 후 `isDesktop` 상태로 PC/모바일 `<Swiper>`를 별개 JSX로 분기하는 재설계 — 🔴 치명적 재발 위험 소스 레벨 확인.**
+
+- 의도: `direction`을 런타임에 바꾸면 virtual+loop 조합에서 `realIndex`가 깨지는 버그(기존 `breakpoints` prop에서 발견)를 피하려고, `isDesktop ? <Swiper direction="horizontal" .../> : <Swiper direction="vertical" .../>` 형태로 **두 개의 별개 JSX 엘리먼트**를 조건부 렌더링하도록 변경.
+- **`node_modules/swiper/swiper-react.mjs`, `shared/update-swiper.mjs` 소스 레벨로 확인한 결과, 이 방식은 근본 문제를 해결하지 못함.** React의 재조정(reconciliation)은 "같은 트리 위치 + 같은 컴포넌트 타입"이면 언마운트/재마운트 없이 **기존 인스턴스를 재사용하고 props만 갱신**한다(React 공식 diffing 알고리즘). 두 삼항연산자 분기 모두 동일한 `Swiper`(같은 import, 같은 함수 참조) 컴포넌트이고 부모 트리 내 같은 위치에 있으므로, `isDesktop`이 토글돼도 React는 **완전히 같은 Fiber/인스턴스를 유지**하며 `direction`, `virtual`, `slidesPerView`, `spaceBetween` 등이 바뀐 props로 전달될 뿐이다.
+- `swiper-react.mjs`의 두 번째 `useIsomorphicLayoutEffect`(deps 없음, 매 렌더 후 실행)가 `getChangedParams(passedParams, oldPassedParamsRef.current, ...)`로 이전 props와 diff하고, 바뀐 게 있으면 `updateSwiper()`를 호출한다. `update-swiper.mjs`의 `updateSwiper()` 안에 `if (changedParams.includes('direction')) { swiper.changeDirection(passed.direction, false); }` 코드가 명시적으로 존재 — 이것이 바로 기존에 `breakpoints`로 재현했던, **virtual+loop 조합에서 `realIndex`를 깨뜨리는 그 코드 경로와 100% 동일**하다. 트리거 지점만 "Swiper 내부 breakpoint 로직"에서 "React props 재조정"으로 바뀌었을 뿐, 실제 버그 재현 메커니즘은 그대로 남아있다.
+- **재현 조건**: 최초 페이지 로드 시점(첫 렌더)에는 문제 없음 — `initSwiper()`가 `if (!swiperElRef.current) initSwiper()` 가드로 오직 최초 1회만 실행되고, 이때 이미 올바른 고정 `direction`으로 Swiper 인스턴스가 생성되기 때문. 문제는 **세션 도중 실제로 1024px 경계를 넘는 리사이즈/회전이 한 번이라도 발생했을 때만** 트리거된다(PC 브라우저 창 크기 조절, 폴더블/태블릿 회전 등). 사용자가 설명한 Playwright 검증("모바일/PC 각각 최초 로드 후 realIndex:0 확인, 자동재생·스와이프 스트레스 테스트")은 이 "세션 도중 실제 리사이즈로 경계를 넘는" 시나리오를 포함하지 않았을 가능성이 높다 — 즉 테스트가 통과한 것이 이 설계가 안전함을 증명하지 않는다.
+- **수정 방법**: 두 `<Swiper>` 분기에 서로 다른 `key`를 부여해 React가 강제로 언마운트/재마운트하게 만들어야 함 — `<Swiper key="desktop" .../>` / `<Swiper key="mobile" .../>`. `key`가 다르면 React는 이전 Fiber를 버리고(`swiper-react.mjs`의 마운트 이펙트 cleanup에서 `swiper.destroy(true, false)` 호출) 완전히 새 Swiper$1 인스턴스를 생성하므로, `updateSwiper()`/`changeDirection()` 경로 자체가 절대 실행되지 않는다. **`key` prop 없이 "두 개의 별개 JSX 엘리먼트"라고 서술하는 것은 React 재조정 관점에서 사실이 아님 — 이 패턴(같은 컴포넌트 타입의 조건부 렌더링으로 "인스턴스 분리"를 의도하는 경우) 자체를 이 프로젝트의 다른 곳에서도 만나면 항상 `key` 유무를 확인할 것.**
+- `key` 추가에 따른 부수 조정 필요: (1) 리마운트 시 새 인스턴스는 기본적으로 slide 0에서 시작하므로 `initialSlide={activeIndex}`를 양쪽 분기에 추가해 위치 연속성 보존 권장. (2) `onSwiper`가 항상 `swiper.autoplay.stop()`을 호출하므로, 리마운트 시점에 `autoplayOn` state가 `true`였다면 UI(재생 버튼 라벨)와 실제 재생 상태가 어긋남 — 리마운트 후에도 `autoplayOn`이 true면 autoplay를 이어서 시작하도록 보정 필요(우선순위 낮음, 위 key 수정과 함께 처리 권장).
+
+**같은 회차 확인: 이전 리뷰 항목 재확인.**
+- 닫기 버튼 `onClick`에 `e.stopPropagation()` 추가됨 — **이전에 지적했던 배경 클릭 핸들러와의 중복 호출 이슈 해결 확인.** 재지적 불필요.
+- 닫기 버튼 크기는 여전히 38×38px(`p-2` + 22px 아이콘) — 44px 미만, 기존 지적 유지(우선순위 낮음, 반복 언급 불필요).
+- `useState(() => typeof window !== "undefined" && window.innerWidth >= 1024)` lazy init — hydration mismatch 우려 없음 확인. `app/photos/page.tsx`가 `<ClientOnly><PhotosGate /></ClientOnly>`로 감싸고, `ClientOnly`는 `useSyncExternalStore`(`getServerSnapshot` → false)로 구현되어 있어 SSR 및 하이드레이션 매칭 패스에서는 항상 `null`을 렌더링하고, `PhotoCarousel`은 마운트 이후에야 처음 렌더링됨 — 즉 서버에서 생성된 HTML과 대조(hydrate)되는 대상 자체가 아니므로 안전.
+- `window.matchMedia` change 리스너 — `addEventListener`/`removeEventListener` 정상 대칭, 메모리 누수 없음.
+- `virtual` prop이 PC는 객체(`{slidesPerViewAutoSlideSize: 384}`), 모바일은 `boolean`(`virtual`) — Swiper의 다른 모듈 옵션(pagination/navigation/autoplay 등)과 동일하게 `boolean | Options` 유니언 타입 패턴이라 타입 충돌 없음(정확한 `.d.ts` 유니언 선언은 번들 구조상 직접 확인은 어려웠으나, `update-swiper.mjs`의 `paramsList`에 `virtual`이 다른 모듈 옵션과 동일하게 취급되는 것으로 간접 확인).
+- 패딩 wrapper div(`p-4 pb-6` 카드 느낌) — `onClick={() => openEnlarged(i)}`가 안쪽 카드 div에만 있어 패딩 영역 탭은 확대 뷰를 열지 않음(의도된 여백으로 보이며 버그 아님). 레이아웃도 `w-full h-full` 중첩이라 퍼센트 연쇄에 문제 없음.
+- PC용 `sizes="(max-width: 1023px) 100vw, 78vw"` — 데스크탑 분기의 실제 렌더 폭은 `lg:max-w-[384px]!`로 캡되어 있는데, `isDesktop` 임계값이 1024px이므로 데스크탑에서 `78vw`는 항상 799px 이상(1024×0.78)으로 실제 384px 캡보다 훨씬 큼 — 이전 회차에 지적했던 "sizes가 실제 렌더 크기와 어긋나는" 패턴이 모바일은 해소됐지만 PC 쪽은 여전히(그리고 이번에 처음 명시적으로) 과다 요청 상태. `sizes="(max-width: 1023px) 100vw, 384px"`로 조정 권장(🟡, 중간 우선순위, 성능/대역폭).
+- 코드 중복: PC/모바일 두 `<Swiper>`의 `autoplay`, `onAutoplayTimeLeft`, `onSwiper`, `onSlideChange` 콜백이 완전히 동일 — 공통 props 객체로 추출 권장(🟡, key 리팩터링과 함께 처리하면 좋음).
+
 **Why:** 향후 이 컴포넌트나 유사한 갤러리/캐러셀 컴포넌트를 리뷰할 때 동일한 이슈를 반복 조사하지 않도록. [[모바일 아이콘 버튼 터치 타겟 크기 체크]]
 
-**How to apply:** jumpSlices의 realIndex 사용, 메인 컨트롤 바 버튼 크기, `Virtual` 모듈 도입, jumpSlides/openEnlarged 계열 인덱스 정합성, `useMemo` 적용은 모두 검증 완료 — 재지적 불필요. **다음 리뷰 시 최우선 확인**: (1) SwiperSlide의 Tailwind 너비/높이 클래스가 `!` 등으로 실제 적용되는지(cascade layer 충돌 수정 여부) — DevTools computed style로 확인 권장, (2) `sizes` prop이 vertical(모바일)/horizontal(데스크탑) 각 모드의 실제 렌더 크기와 일치하는지, (3) Vercel Hobby 이미지 최적화 월 1,000장 한도 근접 이슈, (4) 닫기 버튼 38x38px 개선 여부(낮은 우선순위). Swiper `onSwiper` 콜백에서 autoplay/기타 모듈을 즉시 정지·설정하는 패턴, `virtual` + React 조합 지식(React wrapper의 `renderExternal` 자동 주입, loop 인덱스 매핑)은 이 컴포넌트 외 다른 캐러셀에도 적용 가능. **Tailwind v4 cascade layers vs 서드파티 unlayered CSS 충돌 패턴은 이 프로젝트의 다른 라이브러리 통합(향후 차트/데이트피커 등)에도 일반 적용 가능한 체크포인트로 기억할 것.**
+**How to apply:** jumpSlices의 realIndex 사용, 메인 컨트롤 바 버튼 크기, `Virtual` 모듈 도입, jumpSlides/openEnlarged 계열 인덱스 정합성, `useMemo` 적용, `!important` cascade 수정, flex 순환 높이 버그(`min-h-0`) 수정, 닫기 버튼 stopPropagation은 모두 검증/수정 완료 — 재지적 불필요. **다음 리뷰 시 확인(최우선)**: `isDesktop` 삼항연산자 분기에 `key` prop이 추가됐는지(추가 전이라면 여전히 🔴), 추가됐다면 `initialSlide`/`autoplayOn` 연속성 보정이 함께 됐는지. 그 외: (1) PC `sizes`를 `384px` 캡 기준으로 수정했는지, (2) 두 Swiper 분기 공통 props 추출 여부, (3) Vercel Hobby 이미지 최적화 월 1,000장 한도 근접 이슈, (4) 닫기 버튼 38x38px 개선 여부(낮은 우선순위), (5) 모바일 다운로드 버튼 완전 은닉 기획 의도(안내 문구 추가 여부). Swiper `onSwiper` 콜백에서 autoplay/기타 모듈을 즉시 정지·설정하는 패턴, `virtual` + React 조합 지식(React wrapper의 `renderExternal` 자동 주입, loop 인덱스 매핑), percentage-height-against-auto-parent가 auto로 폴백하는 CSS 스펙 동작은 이 컴포넌트 외 다른 캐러셀/레이아웃에도 적용 가능. **Tailwind v4 cascade layers vs 서드파티 unlayered CSS 충돌 패턴, 그리고 `!important`가 이를 해결하는 근거(스펙상 importance가 layer보다 먼저 비교됨)는 이 프로젝트의 다른 라이브러리 통합에도 일반 적용 가능한 체크포인트로 기억할 것.** **신규 일반 원칙: 같은 컴포넌트 타입을 조건부 삼항연산자로 렌더링해 "서로 다른 인스턴스"를 의도하는 패턴은 `key` prop이 없으면 React가 인스턴스를 재사용해 props diff/update만 발생시킨다 — 이 프로젝트의 다른 컴포넌트에서도 "완전히 분리했다"는 주장이 나오면 항상 `key` 유무부터 확인할 것.**
+
+**2026-07-30(5차) 리뷰: 이전 회차 🔴 최종 해소 확인, 새 치명적 이슈 없음 — 커밋 승인.**
+
+- `key="desktop"`/`key="mobile"` 추가 확인 + 양쪽 모두 `initialSlide={activeIndex}`, `onSwiper`에서 `autoplayOn` 값 기준 `autoplay.start()/stop()` 복원 로직 확인. **4차 리뷰에서 지적한 🔴(key 없이 삼항 분기)는 완전히 해소됨.**
+- PC `sizes="(max-width: 1023px) 100vw, 384px"`로 수정 확인 — 데스크탑 실제 렌더 캡(`lg:max-w-[384px]!`)과 정확히 일치. **해소 확인.**
+- 닫기 버튼 `p-3`(12px) + 22px 아이콘 = 46px — 44px 터치 타겟 기준 충족으로 수정됨(기존 38×38px에서 개선). **해소 확인.**
+- 두 Swiper 분기의 `autoplay` 옵션 객체, `onAutoplayTimeLeft`, `onSwiper`, `onSlideChange` 콜백이 여전히 완전 중복 — 4차 리뷰와 동일 지적 유지(🟡, 우선순위 낮음, 공통 props 객체로 추출 제안, 블로킹 아님).
+- 신규 발견(🟢, 매우 낮은 우선순위): `key` 리마운트 시 React가 이전 Swiper unmount(destroy) → 신규 mount를 같은 커밋 내에서 처리하므로 실사용 리스크는 거의 없으나, 이론상 리사이즈가 1024px 경계를 넘는 그 찰나에 사용자가 컨트롤 버튼을 탭하면 `swiperRef.current`가 방금 destroy된 인스턴스를 가리킬 수 있는 아주 좁은 윈도우가 존재. 실제로 막을 필요는 없음(참고만).
+- `MusicPlayerDock.tsx`: `usePathname() === "/photos"` 조건으로 `/photos` 외 라우트에서 `return null`(하위 `<MusicPlayer>`와 `<audio>` 완전 언마운트) — 커밋 메시지(d27d6ed)에 명시된 의도된 동작. 부작용: `/photos`를 벗어났다가 돌아오면 재생 위치/재생 상태가 초기화됨(의도된 것으로 보임, 버그 아님). Hook은 조건부 return 이전에 호출되어 rules-of-hooks 위반 없음.
+- ESLint 7종 패턴(react-hooks/*, @next/next/*, @typescript-eslint/*, react/*) 육안 검사 결과 위반 없음(unused vars/any/img element/key 누락 등 전부 클린).
+- **결론: 이번 diff는 커밋을 막을 치명적 이슈 없음.** 남은 항목은 전부 🟡/🟢 수준(중복 코드 추출, 매우 낮은 확률의 edge case)으로 선택적 개선 사항.
