@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useSetAtom } from "jotai";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Virtual } from "swiper/modules";
@@ -15,6 +16,7 @@ import {
   PauseIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
+import { photoEnlargedAtom } from "@/store/atoms";
 
 export interface PhotoMeta {
   filename: string;
@@ -47,6 +49,13 @@ export default function PhotoCarousel() {
   const [autoplayOn, setAutoplayOn] = useState(false);
   const [enlargedIndex, setEnlargedIndex] = useState<number | null>(null);
   const enlargedPhoto = enlargedIndex !== null ? photos[enlargedIndex] : null;
+  const setPhotoEnlarged = useSetAtom(photoEnlargedAtom);
+
+  // 확대뷰가 열린 채로 페이지를 완전히 벗어나면(뒤로가기 등) closeEnlarged가
+  // 호출되지 않아 atom이 true로 고착될 수 있다 — 언마운트 시 강제로 초기화.
+  useEffect(() => {
+    return () => setPhotoEnlarged(false);
+  }, [setPhotoEnlarged]);
 
   // Swiper의 virtual+loop 모드는 direction을 런타임에 바꾸면(breakpoints 포함)
   // realIndex가 깨지는 라이브러리 버그가 있어, PC/모바일 Swiper 인스턴스를
@@ -71,13 +80,15 @@ export default function PhotoCarousel() {
   const openEnlarged = useCallback(
     (index: number) => {
       swiperRef.current?.autoplay.stop();
+      setPhotoEnlarged(true);
       showEnlarged(index);
     },
-    [showEnlarged],
+    [showEnlarged, setPhotoEnlarged],
   );
 
   const closeEnlarged = () => {
     setEnlargedIndex(null);
+    setPhotoEnlarged(false);
     if (autoplayOn) swiperRef.current?.autoplay.start();
   };
 
@@ -346,7 +357,7 @@ export default function PhotoCarousel() {
               e.stopPropagation();
               closeEnlarged();
             }}
-            className="absolute right-4 p-3 rounded-full active:scale-90 transition-transform [touch-action:manipulation]"
+            className="absolute right-4 p-3 rounded-full active:opacity-50 transition-opacity [touch-action:manipulation]"
             style={{
               top: "calc(env(safe-area-inset-top) + 16px)",
               background: "rgba(255, 255, 255, 0.15)",

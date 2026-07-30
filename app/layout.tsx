@@ -90,16 +90,18 @@ export default function RootLayout({
             <BottomNav />
           </AppPanel>
 
-        </RecoilProvider>
+          {/*
+            전역 고정 뮤직 플레이어 — #app-panel의 형제로 배치(자손 아님).
+            #app-panel은 lg 브레이크포인트에서 backdrop-filter가 걸려 fixed 자손의
+            containing block이 되어버리므로, 그 조상 밖에 둬야 전체 브라우저 너비
+            기준으로 고정된다 (데스크탑에서도 390px 패널이 아닌 창 전체 중앙에 위치).
+            RecoilProvider(Jotai Provider)의 자손으로는 유지해야 PhotoCarousel과
+            같은 atom store를 공유해서 photoEnlargedAtom으로 확대뷰 중 숨김 처리가 가능하다.
+            /photos 페이지에서만 렌더링(그 외 경로는 null) — MusicPlayerDock 내부에서 처리.
+          */}
+          <MusicPlayerDock />
 
-        {/*
-          전역 고정 뮤직 플레이어 — RecoilProvider 밖, body 바로 아래에 배치.
-          #app-panel은 lg 브레이크포인트에서 backdrop-filter가 걸려 fixed 자손의
-          containing block이 되어버리므로, 그 조상 밖에 둬야 전체 브라우저 너비
-          기준으로 고정된다 (데스크탑에서도 390px 패널이 아닌 창 전체 중앙에 위치).
-          /photos 페이지에서만 렌더링(그 외 경로는 null) — MusicPlayerDock 내부에서 처리.
-        */}
-        <MusicPlayerDock />
+        </RecoilProvider>
 
         {/*
           Service Worker 등록 — load 이벤트 후 실행해 초기 로드 성능에 영향 없게 함.
